@@ -1,0 +1,219 @@
+import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+
+import AdminAbandonedCartsTable from '../components/admin/AdminAbandonedCartsTable'
+import AdminCustomersTable from '../components/admin/AdminCustomersTable'
+import AdminMetricCard from '../components/admin/AdminMetricCard'
+import AdminOrdersTable from '../components/admin/AdminOrdersTable'
+import AdminProductForm from '../components/admin/AdminProductForm'
+import AdminProductsTable from '../components/admin/AdminProductsTable'
+import { buildProductPayload, emptyProductForm, mapProductToForm } from '../helpers/admin'
+import { formatPrice } from '../helpers/price'
+import api from '../services/api'
+
+function AdminDashboard() {
+  const token = localStorage.getItem('token')
+  const navigate = useNavigate()
+
+  const [loading, setLoading] = useState(Boolean(token))
+  const [savingProduct, setSavingProduct] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const [metrics, setMetrics] = useState(null)
+  const [customers, setCustomers] = useState([])
+  const [orders, setOrders] = useState([])
+  const [abandonedCarts, setAbandonedCarts] = useState([])
+  const [products, setProducts] = useState([])
+
+  const [productForm, setProductForm] = useState({ ...emptyProductForm })
+  const [editingProductId, setEditingProductId] = useState(null)
+
+  const loadAdminData = useCallback(async () => {
+    setLoading(true)
+    setError('')
+
+    try {
+      const [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes] = await Promise.all([
+        api.get('/admin/dashboard'),
+        api.get('/admin/customers', { params: { limit: 300 } }),
+        api.get('/admin/orders', { params: { limit: 300 } }),
+        api.get('/admin/abandoned-carts', { params: { limit: 300 } }),
+        api.get('/products', { params: { page: 1, size: 100 } }),
+      ])
+
+      setMetrics(dashboardRes.data.metrics)
+      setCustomers(customersRes.data)
+      setOrders(ordersRes.data)
+      setAbandonedCarts(abandonedRes.data)
+      setProducts(productsRes.data.products || [])
+    } catch (loadError) {
+      console.error('Erro ao carregar dashboard admin:', loadError)
+      const status = loadError?.response?.status
+      const serverMessage = loadError?.response?.data?.detail
+
+      if (status === 401) {
+        localStorage.removeItem('token')
+        navigate('/login')
+        return
+      }
+
+      if (status === 403) {
+        setError('Sua conta nao tem permissao para acessar a dashboard admin.')
+        return
+      }
+
+      setError(serverMessage || 'Nao foi possivel carregar a dashboard admin.')
+    } finally {
+      setLoading(false)
+    }
+  }, [navigate])
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/login')
+      return
+    }
+    const loadTimer = window.setTimeout(() => {
+      void loadAdminData()
+    }, 0)
+    return () => window.clearTimeout(loadTimer)
+  }, [loadAdminData, navigate, token])
+
+  useEffect(() => {
+    if (!success) {
+      return undefined
+    }
+    const timer = setTimeout(() => setSuccess(''), 2500)
+    return () => clearTimeout(timer)
+  }, [success])
+
+  const handleProductFieldChange = (field, value) => {
+    setProductForm((currentForm) => ({ ...currentForm, [field]: value }))
+  }
+
+  const resetProductForm = () => {
+    setEditingProductId(null)
+    setProductForm({ ...emptyProductForm })
+  }
+
+  const handleSubmitProduct = async () => {
+    setSavingProduct(true)
+    setError('')
+
+    try {
+      const payload = buildProductPayload(productForm)
+
+      if (editingProductId) {
+        await api.put(`/products/${editingProductId}`, payload)
+        setSuccess('Produto atualizado com sucesso.')
+      } else {
+        await api.post('/products/', payload)
+        setSuccess('Produto cadastrado com sucesso.')
+      }
+
+      resetProductForm()
+      await loadAdminData()
+    } catch (submitError) {
+      console.error('Erro ao salvar produto:', submitError)
+      const serverMessage = submitError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel salvar o produto.')
+    } finally {
+      setSavingProduct(false)
+    }
+  }
+
+  const handleEditProduct = (product) => {
+    setEditingProductId(product.id)
+    setProductForm(mapProductToForm(product))
+    setError('')
+  }
+
+  const handleDeleteProduct = async (product) => {
+    const confirmed = window.confirm(`Deseja excluir o produto "${product.name}"?`)
+    if (!confirmed) {
+      return
+    }
+
+    setError('')
+    try {
+      await api.delete(`/products/${product.id}`)
+      setSuccess('Produto excluido com sucesso.')
+      if (editingProductId === product.id) {
+        resetProductForm()
+      }
+      await loadAdminData()
+    } catch (deleteError) {
+      console.error('Erro ao excluir produto:', deleteError)
+      const serverMessage = deleteError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel excluir o produto.')
+    }
+  }
+
+  if (!token) {
+    return null
+  }
+
+  if (loading) {
+    return (
+      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-zinc-300">
+        Carregando dashboard admin...
+      </div>
+    )
+  }
+
+  return (
+    <section className="space-y-6">
+      <header className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6">
+        <h1 className="text-3xl font-semibold text-zinc-100">Dashboard Admin</h1>
+        <p className="mt-2 text-zinc-400">Gestao de pedidos, produtos, clientes, vendas e carrinhos abandonados.</p>
+      </header>
+
+      {error && (
+        <div className="rounded-2xl border border-red-500/30 bg-red-950/40 p-4 text-sm text-red-200">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/40 p-4 text-sm text-emerald-200">
+          {success}
+        </div>
+      )}
+
+      {metrics && (
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <AdminMetricCard title="Pedidos" value={metrics.total_orders} subtitle={`${metrics.paid_orders} pagos`} />
+          <AdminMetricCard title="Vendas" value={formatPrice(metrics.total_sales_amount)} subtitle={`${formatPrice(metrics.paid_sales_amount)} pagas`} />
+          <AdminMetricCard title="Clientes" value={metrics.total_customers} />
+          <AdminMetricCard title="Produtos" value={metrics.total_products} />
+          <AdminMetricCard title="Abandonados" value={metrics.abandoned_carts} subtitle={`${metrics.abandoned_items} itens`} />
+        </div>
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+        <AdminProductForm
+          form={productForm}
+          loading={savingProduct}
+          editing={Boolean(editingProductId)}
+          onChange={handleProductFieldChange}
+          onSubmit={handleSubmitProduct}
+          onCancelEdit={resetProductForm}
+        />
+
+        <AdminAbandonedCartsTable carts={abandonedCarts} />
+      </div>
+
+      <AdminProductsTable
+        products={products}
+        loading={loading}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteProduct}
+      />
+
+      <AdminOrdersTable orders={orders} />
+      <AdminCustomersTable customers={customers} />
+    </section>
+  )
+}
+
+export default AdminDashboard
