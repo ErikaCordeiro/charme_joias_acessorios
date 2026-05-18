@@ -56,7 +56,7 @@ uvicorn app.main:app --reload
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 
 ## 📱 URLs de Acesso

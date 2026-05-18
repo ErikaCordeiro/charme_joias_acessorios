@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.core.logging import logger
 from app.core.monitoring import init_sentry
 from app.core.schema_sync import sync_schema
-from app.database import engine
+from app.database import AsyncSessionLocal, engine
 from app.models.base import Base
 from app.routers.auth import router as auth_router
 from app.routers.product import router as product_router
@@ -14,6 +14,7 @@ from app.routers.shipping import router as shipping_router
 from app.routers.order import router as order_router
 from app.routers.admin import router as admin_router
 from app.core.exceptions import AppException
+from app.services.catalog_seed import sync_default_products
 
 # Initialize monitoring
 init_sentry()
@@ -25,10 +26,13 @@ app = FastAPI(
 )
 
 # Configure CORS
+cors_origins = settings.get_cors_origins()
+allow_credentials = "*" not in cors_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Frontend URLs
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -39,6 +43,17 @@ async def on_startup() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await conn.run_sync(sync_schema)
+
+    if settings.SEED_DEFAULT_PRODUCTS:
+        try:
+            async with AsyncSessionLocal() as session:
+                created_count, updated_count = await sync_default_products(session)
+                logger.info(
+                    "Default products synchronized on startup. "
+                    f"Created: {created_count}, Updated: {updated_count}"
+                )
+        except Exception as seed_error:
+            logger.error(f"Failed to sync default products: {seed_error}")
 
 
 app.include_router(auth_router)

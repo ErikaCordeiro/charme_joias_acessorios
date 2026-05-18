@@ -5,5 +5,15 @@ from .shipping import ShippingService
 from .payment import PaymentService
 from .order import OrderService
 from .admin import AdminService
+from .catalog_seed import sync_default_products
 
-__all__ = ["AuthService", "ProductService", "CartService", "ShippingService", "PaymentService", "OrderService", "AdminService"]
+__all__ = [
+    "AuthService",
+    "ProductService",
+    "CartService",
+    "ShippingService",
+    "PaymentService",
+    "OrderService",
+    "AdminService",
+    "sync_default_products",
+]

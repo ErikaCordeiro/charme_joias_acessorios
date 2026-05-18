@@ -1,75 +1,38 @@
-# Guia Rápido de Deploy - Lua Active
+# Deploy no Render
 
-## 🚀 Opções de Deploy
+## 1) Pre-requisitos
 
-### 1. Railway (Mais Fácil)
-```bash
-# Instalar CLI
-npm install -g @railway/cli
-railway login
+- Repositorio no GitHub atualizado
+- Conta no Render conectada ao GitHub
 
-# Deploy
-railway init
-railway up
-```
+## 2) Deploy com Blueprint (`render.yaml`)
 
-### 2. Heroku
-```bash
-# Instalar CLI
-heroku login
-heroku create lua-active-api
+1. No Render, clique em **New +** -> **Blueprint**.
+2. Selecione o repositorio `ErikaCordeiro/Lua_Active`.
+3. O Render vai detectar o arquivo `render.yaml` e criar:
+   - `lua-active-db` (PostgreSQL)
+   - `lua-active-api` (FastAPI)
+   - `lua-active-web` (Frontend estatico)
+4. Durante a criacao, preencha:
+   - `VITE_API_BASE_URL`: URL publica do backend (ex.: `https://lua-active-api.onrender.com`)
+   - `SENTRY_DSN` (opcional)
 
-# Deploy
-git push heroku main
-```
+## 3) Variaveis importantes (backend)
 
-### 3. Render
-- Conecte repositório Git
-- Configure Python runtime
-- Build: `pip install -r requirements.txt`
-- Start: `uvicorn app.main:app --host 0.0.0.0 --port 10000`
+- `DATABASE_URL`: preenchida automaticamente via `fromDatabase`
+- `SECRET_KEY`: gerada automaticamente
+- `ENVIRONMENT=production`
+- `ADMIN_EMAILS=erikagcordeiro25@gmail.com`
+- `CORS_ORIGINS=*` (modo teste)
 
-## 🔧 Configurações Necessárias
+## 4) Validacao apos deploy
 
-### Variáveis de Ambiente
-```
-DATABASE_URL=postgresql://...
-SECRET_KEY=your-super-secret-key
-SENTRY_DSN=https://your-sentry-dsn
-ENVIRONMENT=production
-```
+- API health: `https://<api-service>.onrender.com/healthz`
+- API docs: `https://<api-service>.onrender.com/docs`
+- Frontend: `https://<web-service>.onrender.com`
 
-### Banco de Dados
-- Railway: PostgreSQL automático
-- Heroku: `heroku addons:create heroku-postgresql`
-- Render: PostgreSQL incluído
+## 5) Observacao sobre CORS em producao
 
-## 📱 Deploy do Frontend
+Para ambiente definitivo, troque `CORS_ORIGINS=*` por dominios explicitos, por exemplo:
 
-### Netlify
-```bash
-cd frontend
-npm run build
-# Deploy via drag-and-drop ou Git
-```
-
-### Vercel
-```bash
-vercel --prod
-```
-
-## ✅ Checklist Pré-Deploy
-
-- [ ] SECRET_KEY forte gerada
-- [ ] SENTRY_DSN configurado (opcional)
-- [ ] Banco PostgreSQL configurado
-- [ ] Migrações executadas
-- [ ] Seed de dados executado
-- [ ] Frontend buildado
-- [ ] Testes locais funcionando
-
-## 🔍 URLs de Produção
-
-- API: https://your-app-name.railway.app
-- Docs: https://your-app-name.railway.app/docs
-- Frontend: https://your-app-name.netlify.app
+`https://lua-active-web.onrender.com`
