@@ -1,8 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { getStoredToken } from '../../helpers/storage'
 
 function HomeLandingHeader() {
-  const token = localStorage.getItem('token')
+  const token = getStoredToken()
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const accountPath = token ? '/profile' : '/login'

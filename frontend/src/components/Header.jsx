@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
+import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
 function Header() {
   const navigate = useNavigate()
   const location = useLocation()
-  const token = localStorage.getItem('token')
+  const token = getStoredToken()
   const [isAdmin, setIsAdmin] = useState(false)
   const accountPath = token ? '/profile' : '/login'
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    clearStoredToken()
     setIsAdmin(false)
     navigate('/login')
   }

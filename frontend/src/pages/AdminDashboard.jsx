@@ -9,10 +9,11 @@ import AdminProductForm from '../components/admin/AdminProductForm'
 import AdminProductsTable from '../components/admin/AdminProductsTable'
 import { buildProductPayload, emptyProductForm, mapProductToForm } from '../helpers/admin'
 import { formatPrice } from '../helpers/price'
+import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
 function AdminDashboard() {
-  const token = localStorage.getItem('token')
+  const token = getStoredToken()
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(Boolean(token))
@@ -53,7 +54,7 @@ function AdminDashboard() {
       const serverMessage = loadError?.response?.data?.detail
 
       if (status === 401) {
-        localStorage.removeItem('token')
+        clearStoredToken()
         navigate('/login')
         return
       }

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import FeedbackToast from '../components/FeedbackToast'
 import { formatPrice } from '../helpers/price'
+import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
 const placeholderImage = (title) => {
@@ -56,7 +57,7 @@ function Products() {
   }, [feedback])
 
   const addToCart = async (productId) => {
-    const token = localStorage.getItem('token')
+    const token = getStoredToken()
     if (!token) {
       navigate('/login')
       return
@@ -75,7 +76,7 @@ function Products() {
       const serverMessage = postError?.response?.data?.detail
 
       if (status === 401 || status === 403) {
-        localStorage.removeItem('token')
+        clearStoredToken()
         navigate('/login')
         return
       }

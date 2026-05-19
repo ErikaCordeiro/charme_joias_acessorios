@@ -5,10 +5,11 @@ import FeedbackToast from '../components/FeedbackToast'
 import CartItemCard from '../components/cart/CartItemCard'
 import { hydrateCartWithProducts } from '../helpers/cartHydration'
 import { formatPrice } from '../helpers/price'
+import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
 function Cart() {
-  const token = localStorage.getItem('token')
+  const token = getStoredToken()
   const [cart, setCart] = useState(null)
   const [loading, setLoading] = useState(Boolean(token))
   const [error, setError] = useState('')
@@ -19,7 +20,7 @@ function Cart() {
   const handleAuthError = useCallback(
     (statusCode) => {
       if (statusCode === 401 || statusCode === 403) {
-        localStorage.removeItem('token')
+        clearStoredToken()
         navigate('/login')
         return true
       }

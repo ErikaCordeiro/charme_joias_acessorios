@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { setStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
 function Login() {
@@ -19,7 +20,7 @@ function Login() {
       const response = await api.post('/auth/login', { email, password })
       const token = response.data?.access_token
       if (token) {
-        localStorage.setItem('token', token)
+        setStoredToken(token)
         navigate('/profile')
       } else {
         setError('Nao foi possivel autenticar. Tente novamente.')

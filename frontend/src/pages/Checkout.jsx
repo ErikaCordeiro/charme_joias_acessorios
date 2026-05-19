@@ -18,6 +18,7 @@ import {
 } from '../helpers/payment'
 import { formatPrice } from '../helpers/price'
 import { estimateCartWeight, formatCep, normalizeCep } from '../helpers/shipping'
+import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import { formatFullAddress } from '../helpers/userProfile'
 import api from '../services/api'
 
@@ -35,7 +36,7 @@ const getPaymentStatusTitle = (paymentStatus) => {
 }
 
 function Checkout() {
-  const token = localStorage.getItem('token')
+  const token = getStoredToken()
   const navigate = useNavigate()
 
   const [cart, setCart] = useState(null)
@@ -65,7 +66,7 @@ function Checkout() {
   const handleAuthError = useCallback(
     (statusCode) => {
       if (statusCode === 401 || statusCode === 403) {
-        localStorage.removeItem('token')
+        clearStoredToken()
         navigate('/login')
         return true
       }
