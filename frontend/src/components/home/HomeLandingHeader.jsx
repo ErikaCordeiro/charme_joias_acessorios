@@ -23,18 +23,18 @@ function HomeLandingHeader() {
   return (
     <div className="relative z-20 border-b border-zinc-800/80 bg-black/55 backdrop-blur">
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-10">
-        <Link to="/" className="shrink-0 text-4xl font-black uppercase italic tracking-tight text-zinc-100 sm:text-5xl">
-          LUA
-          <span className="block -mt-2 text-[0.48em] not-italic font-semibold tracking-[0.2em] text-zinc-300">
-            ACTIVE
+        <Link to="/" className="shrink-0 font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          Charme
+          <span className="block text-[0.34em] font-sans font-bold uppercase tracking-[0.24em] text-white/75">
+            Joias Acessórios
           </span>
         </Link>
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold uppercase tracking-[0.08em] text-zinc-200">
           <Link to="/" className="border-b-2 border-zinc-200 pb-1 text-white">Inicio</Link>
           <Link to="/products" className="pb-1 transition hover:text-white">Produtos</Link>
-          <Link to="/products?category=camisetas" className="pb-1 transition hover:text-white">Categorias</Link>
-          <Link to="/products" className="pb-1 transition hover:text-white">Lancamentos</Link>
+          <Link to="/products?category=semijoias" className="pb-1 transition hover:text-white">Categorias</Link>
+          <Link to="/products" className="pb-1 transition hover:text-white">Lançamentos</Link>
           <Link to="/products" className="pb-1 transition hover:text-white">Colecoes</Link>
           <Link to="/about" className="pb-1 transition hover:text-white">Sobre nos</Link>
         </nav>

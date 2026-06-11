@@ -3,7 +3,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                serif: ['Playfair Display', 'ui-serif', 'Georgia', 'serif'],
             },
             boxShadow: {
                 soft: '0 26px 70px -34px rgba(0, 0, 0, 0.9)',

@@ -23,7 +23,7 @@ function Login() {
         setStoredToken(token)
         navigate('/profile')
       } else {
-        setError('Nao foi possivel autenticar. Tente novamente.')
+        setError('Não foi possível autenticar. Tente novamente.')
       }
     } catch (loginError) {
       console.error('Erro no login:', loginError)
@@ -35,7 +35,7 @@ function Login() {
           ? `Erro ${status}: ${serverMessage}`
           : axiosMessage
             ? `Erro de conexao: ${axiosMessage}`
-            : 'Nao foi possivel entrar. Verifique seus dados.'
+            : 'Não foi possível entrar. Verifique seus dados.'
       )
     } finally {
       setLoading(false)
@@ -45,7 +45,7 @@ function Login() {
   return (
     <section className="mx-auto max-w-xl rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 shadow-soft">
       <h1 className="text-3xl font-semibold text-white">Entrar</h1>
-      <p className="mt-2 text-zinc-400">Acesse sua conta Lua Active e continue comprando.</p>
+      <p className="mt-2 text-zinc-400">Acesse sua conta Charme Joias e continue comprando.</p>
 
       {error && <div className="mt-6 rounded-3xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</div>}
 
@@ -82,7 +82,7 @@ function Login() {
       </form>
 
       <p className="mt-6 text-sm text-zinc-400">
-        Nao tem conta?{' '}
+        Não tem conta?{' '}
         <Link to="/register" className="text-zinc-300 hover:text-zinc-200">
           Crie uma agora
         </Link>

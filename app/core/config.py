@@ -52,7 +52,8 @@ def normalize_database_url(database_url: str | None) -> str:
 
 
 class Settings(BaseModel):
-    APP_NAME: str = Field("Lua Active")
+    APP_NAME: str = Field("Charme Joias Acessorios")
+    API_V1_PREFIX: str = Field("/api/v1")
     DATABASE_URL: str
     SECRET_KEY: str
     ALGORITHM: str = Field("HS256")
@@ -62,6 +63,11 @@ class Settings(BaseModel):
     ADMIN_EMAILS: str = Field("")
     CORS_ORIGINS: str = Field("")
     SEED_DEFAULT_PRODUCTS: bool = Field(True)
+    FRONTEND_URL: str = Field("")
+    CLOUDINARY_CLOUD_NAME: str = Field("")
+    CLOUDINARY_API_KEY: str = Field("")
+    CLOUDINARY_API_SECRET: str = Field("")
+    CLOUDINARY_DEFAULT_FOLDER: str = Field("charme/produtos")
 
     def is_admin_email(self, email: str) -> bool:
         if not email:
@@ -77,6 +83,8 @@ class Settings(BaseModel):
     def get_cors_origins(self) -> list[str]:
         default_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
         if not self.CORS_ORIGINS:
+            if self.FRONTEND_URL:
+                return [*default_origins, self.FRONTEND_URL]
             return default_origins
 
         origins = [
@@ -84,11 +92,21 @@ class Settings(BaseModel):
             for item in self.CORS_ORIGINS.split(",")
             if item.strip()
         ]
+        if self.FRONTEND_URL and self.FRONTEND_URL not in origins:
+            origins.append(self.FRONTEND_URL)
         return origins or default_origins
+
+    def cloudinary_configured(self) -> bool:
+        return all([
+            self.CLOUDINARY_CLOUD_NAME,
+            self.CLOUDINARY_API_KEY,
+            self.CLOUDINARY_API_SECRET,
+        ])
 
 
 settings = Settings(**{
-    "APP_NAME": get_setting("APP_NAME", "Lua Active"),
+    "APP_NAME": get_setting("APP_NAME", "Charme Joias Acessorios"),
+    "API_V1_PREFIX": get_setting("API_V1_PREFIX", "/api/v1"),
     "DATABASE_URL": normalize_database_url(get_setting("DATABASE_URL")),
     "SECRET_KEY": get_setting("SECRET_KEY"),
     "ALGORITHM": get_setting("ALGORITHM", "HS256"),
@@ -98,4 +116,9 @@ settings = Settings(**{
     "ADMIN_EMAILS": get_setting("ADMIN_EMAILS", ""),
     "CORS_ORIGINS": get_setting("CORS_ORIGINS", ""),
     "SEED_DEFAULT_PRODUCTS": get_setting("SEED_DEFAULT_PRODUCTS", "true"),
+    "FRONTEND_URL": get_setting("FRONTEND_URL", ""),
+    "CLOUDINARY_CLOUD_NAME": get_setting("CLOUDINARY_CLOUD_NAME", ""),
+    "CLOUDINARY_API_KEY": get_setting("CLOUDINARY_API_KEY", ""),
+    "CLOUDINARY_API_SECRET": get_setting("CLOUDINARY_API_SECRET", ""),
+    "CLOUDINARY_DEFAULT_FOLDER": get_setting("CLOUDINARY_DEFAULT_FOLDER", "charme/produtos"),
 })

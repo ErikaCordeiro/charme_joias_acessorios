@@ -38,7 +38,7 @@ function Register() {
         password,
         ...buildUserProfilePayload(form),
       })
-      setSuccess('Cadastro concluido com sucesso. Faca login para continuar.')
+      setSuccess('Cadastro concluído com sucesso. Faça login para continuar.')
       setTimeout(() => navigate('/login'), 1200)
     } catch (registerError) {
       console.error('Erro no registro:', registerError)
@@ -50,7 +50,7 @@ function Register() {
           ? `Erro ${status}: ${serverMessage}`
           : axiosMessage
             ? `Erro de conexao: ${axiosMessage}`
-            : 'Nao foi possivel completar o cadastro. Revise os dados e tente novamente.'
+            : 'Não foi possível completar o cadastro. Revise os dados e tente novamente.'
       )
     } finally {
       setLoading(false)
@@ -60,7 +60,7 @@ function Register() {
   return (
     <section className="mx-auto max-w-4xl rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 shadow-soft">
       <h1 className="text-3xl font-semibold text-white">Criar conta</h1>
-      <p className="mt-2 text-zinc-400">Preencha seus dados para comprar e acompanhar pedidos na Lua Active.</p>
+      <p className="mt-2 text-zinc-400">Preencha seus dados para comprar e acompanhar pedidos na Charme Joias.</p>
 
       {success && <div className="mt-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">{success}</div>}
       {error && <div className="mt-6 rounded-3xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</div>}
@@ -83,7 +83,7 @@ function Register() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="new-password"
-            placeholder="Minimo de 6 caracteres"
+            placeholder="Mínimo de 6 caracteres"
           />
         </div>
 

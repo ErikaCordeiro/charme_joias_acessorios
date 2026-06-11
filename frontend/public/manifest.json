@@ -1,6 +1,6 @@
 {
-    "short_name": "Lua Active",
-    "name": "Lua Active E-commerce",
+    "short_name": "Charme Joias",
+    "name": "Charme Joias Acessórios",
     "icons": [
         {
             "src": "favicon.ico",
@@ -10,6 +10,6 @@
     ],
     "start_url": ".",
     "display": "standalone",
-    "theme_color": "#000000",
-    "background_color": "#ffffff"
+    "theme_color": "#0b6f78",
+    "background_color": "#fbf8f1"
 }

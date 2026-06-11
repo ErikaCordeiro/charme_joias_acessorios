@@ -8,7 +8,7 @@ import api from '../services/api'
 
 const placeholderImage = (title) => {
   const text = encodeURIComponent(title)
-  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 480'%3E%3Crect width='640' height='480' fill='%2309090b'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23f4f4f5' font-family='Arial,Helvetica,sans-serif' font-size='32'%3E${text}%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='%23a1a1aa' font-family='Arial,Helvetica,sans-serif' font-size='20'%3ELua Active%3C/text%3E%3C/svg%3E`
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 480'%3E%3Crect width='640' height='480' fill='%23fbf8f1'/%3E%3Ccircle cx='320' cy='190' r='96' fill='none' stroke='%230b6f78' stroke-width='3'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23111226' font-family='Arial,Helvetica,sans-serif' font-size='32'%3E${text}%3C/text%3E%3Ctext x='50%25' y='68%25' dominant-baseline='middle' text-anchor='middle' fill='%230b6f78' font-family='Arial,Helvetica,sans-serif' font-size='20'%3ECharme Joias%3C/text%3E%3C/svg%3E`
 }
 
 function Products() {
@@ -90,15 +90,15 @@ function Products() {
   }
 
   if (loading) {
-    return <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-300 shadow-soft">Carregando produtos...</div>
+    return <div className="rounded-3xl border border-[#0b6f78]/15 bg-white p-8 text-center text-[#111226]/70 shadow-soft">Carregando produtos...</div>
   }
 
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-semibold text-white">Produtos</h1>
-          <p className="mt-2 text-zinc-400">Selecione seus itens favoritos da colecao Lua Active.</p>
+          <h1 className="font-serif text-4xl font-semibold text-[#111226]">Produtos</h1>
+          <p className="mt-2 text-[#111226]/65">Selecione seus itens favoritos da Charme Joias Acessórios.</p>
           {searchTerm && (
             <p className="mt-1 text-sm text-zinc-500">Busca: "{searchTerm}"</p>
           )}
@@ -109,7 +109,7 @@ function Products() {
 
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
         {products.map((product) => (
-          <article key={product.id} className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6 shadow-soft transition hover:-translate-y-1 hover:border-zinc-300/50">
+          <article key={product.id} className="rounded-3xl border border-[#0b6f78]/15 bg-white p-6 shadow-soft transition hover:-translate-y-1 hover:border-[#0b6f78]/50">
             <div className="space-y-4">
               <div className="relative overflow-hidden rounded-3xl bg-black/80">
                 <img
@@ -123,15 +123,15 @@ function Products() {
                 />
               </div>
               <div className="flex items-center justify-between gap-3 text-zinc-400">
-                <span className="rounded-full bg-zinc-900/80 px-3 py-1 text-xs uppercase tracking-[0.24em]">Estoque {product.stock}</span>
-                <span className="text-sm font-semibold text-zinc-300">{formatPrice(product.price)}</span>
+                <span className="rounded-full bg-[#0b6f78]/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-[#0b6f78]">Estoque {product.stock}</span>
+                <span className="text-sm font-semibold text-[#111226]">{formatPrice(product.price)}</span>
               </div>
-              <h2 className="text-xl font-semibold text-white">{product.name}</h2>
-              <p className="text-sm leading-6 text-zinc-400">{product.description}</p>
+              <h2 className="text-xl font-semibold text-[#111226]">{product.name}</h2>
+              <p className="text-sm leading-6 text-[#111226]/65">{product.description}</p>
               <button
                 type="button"
                 onClick={() => addToCart(product.id)}
-                className="w-full rounded-full bg-zinc-300 px-4 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+                className="w-full rounded-full bg-[#0b6f78] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#095a62]"
               >
                 Adicionar ao Carrinho
               </button>

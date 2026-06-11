@@ -12,9 +12,9 @@ from app.schemas.payment import (
     PaymentStatus,
 )
 
-BANK_PROVIDER_NAME = "Banco Lua Active Sandbox"
+BANK_PROVIDER_NAME = "Banco Charme Joias Sandbox"
 DECLINE_TEST_SUFFIX = "0002"
-PIX_COPY_AND_PASTE_PREFIX = "00020101021126580014BR.GOV.BCB.PIX0136luaactive@sandbox.com5204000053039865406"
+PIX_COPY_AND_PASTE_PREFIX = "00020101021126580014BR.GOV.BCB.PIX0136charmejoias@sandbox.com5204000053039865406"
 
 
 class PaymentService:

@@ -18,6 +18,7 @@ function AdminDashboard() {
 
   const [loading, setLoading] = useState(Boolean(token))
   const [savingProduct, setSavingProduct] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -124,6 +125,30 @@ function AdminDashboard() {
     }
   }
 
+  const handleUploadProductImage = async (file) => {
+    setUploadingImage(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'charme/produtos')
+
+      const response = await api.post('/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      handleProductFieldChange('image_url', response.data.secure_url)
+      setSuccess('Imagem enviada ao Cloudinary com sucesso.')
+    } catch (uploadError) {
+      console.error('Erro ao enviar imagem:', uploadError)
+      const serverMessage = uploadError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel enviar a imagem ao Cloudinary.')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
   const handleEditProduct = (product) => {
     setEditingProductId(product.id)
     setProductForm(mapProductToForm(product))
@@ -199,6 +224,8 @@ function AdminDashboard() {
           onChange={handleProductFieldChange}
           onSubmit={handleSubmitProduct}
           onCancelEdit={resetProductForm}
+          onUploadImage={handleUploadProductImage}
+          uploadingImage={uploadingImage}
         />
 
         <AdminAbandonedCartsTable carts={abandonedCarts} />

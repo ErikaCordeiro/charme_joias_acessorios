@@ -7,7 +7,7 @@ function HomeHighlightsSection({ products, loading, error }) {
     <section className="bg-black pb-14 pt-10">
       <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-10">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-3xl font-black uppercase italic tracking-tight text-zinc-100">Destaques</h2>
+          <h2 className="font-serif text-3xl font-semibold tracking-tight text-zinc-100">Destaques da Charme</h2>
           <Link to="/products" className="text-sm font-semibold uppercase tracking-[0.08em] text-zinc-200 transition hover:text-white">
             Ver todos
           </Link>
@@ -35,7 +35,7 @@ function HomeHighlightsSection({ products, loading, error }) {
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-zinc-900 pt-8">
           <p className="text-4xl font-black uppercase italic tracking-tight text-zinc-100 sm:text-5xl">
-            Seu estilo. Sua forca. Sua historia.
+            Seu estilo. Seu brilho. Sua historia.
           </p>
           <Link
             to="/products"

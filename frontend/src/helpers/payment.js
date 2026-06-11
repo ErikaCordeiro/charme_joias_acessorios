@@ -4,11 +4,11 @@ export const paymentMethods = [
   {
     id: 'pix',
     title: 'Pix',
-    description: 'Confirmacao imediata no ambiente de testes do Banco Lua Active.',
+    description: 'Confirmação imediata no ambiente de testes do Banco Charme Joias.',
   },
   {
     id: 'credit_card',
-    title: 'Cartao de credito',
+    title: 'Cartão de crédito',
     description: 'Aprovacao simulada pelo banco sandbox com cartao de teste.',
   },
   {

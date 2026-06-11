@@ -5,6 +5,8 @@ function AdminProductForm({
   onChange,
   onSubmit,
   onCancelEdit,
+  onUploadImage,
+  uploadingImage = false,
 }) {
   return (
     <section className="rounded-2xl border border-zinc-900 bg-zinc-950/70 p-5">
@@ -64,13 +66,31 @@ function AdminProductForm({
           required
           className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
         />
-        <input
-          type="text"
-          value={form.image_url}
-          onChange={(event) => onChange('image_url', event.target.value)}
-          placeholder="URL da imagem"
-          className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500 md:col-span-2"
-        />
+        <div className="grid gap-3 md:col-span-2 md:grid-cols-[1fr_auto]">
+          <input
+            type="text"
+            value={form.image_url}
+            onChange={(event) => onChange('image_url', event.target.value)}
+            placeholder="URL da imagem Cloudinary"
+            className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+          />
+          <label className="inline-flex h-11 cursor-pointer items-center justify-center rounded-xl border border-zinc-700 px-4 text-xs font-semibold text-zinc-200 transition hover:border-zinc-500">
+            {uploadingImage ? 'Enviando...' : 'Upload Cloudinary'}
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              disabled={uploadingImage}
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                if (file && onUploadImage) {
+                  onUploadImage(file)
+                }
+                event.target.value = ''
+              }}
+              className="sr-only"
+            />
+          </label>
+        </div>
         <textarea
           value={form.description}
           onChange={(event) => onChange('description', event.target.value)}

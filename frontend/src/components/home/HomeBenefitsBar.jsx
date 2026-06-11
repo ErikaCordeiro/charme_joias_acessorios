@@ -1,9 +1,9 @@
 const benefitItems = [
-  { title: 'Frete gratis', subtitle: 'Acima de R$299 para todo Brasil' },
-  { title: 'Produtos premium', subtitle: 'Qualidade que voce sente' },
+  { title: 'Peças exclusivas', subtitle: 'Curadoria delicada e moderna' },
+  { title: 'Semijoias premium', subtitle: 'Brilho para todos os momentos' },
   { title: 'Compra segura', subtitle: 'Dados e pagamento protegidos' },
-  { title: 'Atendimento', subtitle: 'Suporte rapido e humanizado' },
-  { title: 'Parcele em 6x', subtitle: 'Sem juros no cartao' },
+  { title: 'Atendimento', subtitle: 'Pelo WhatsApp com carinho' },
+  { title: 'Presente perfeito', subtitle: 'Escolhas para encantar' },
 ]
 
 function HomeBenefitsBar() {

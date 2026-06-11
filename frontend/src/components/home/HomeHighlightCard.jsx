@@ -17,7 +17,7 @@ function HomeHighlightCard({ product }) {
         />
       </div>
       <div className="space-y-2 p-4">
-        <p className="text-xs uppercase tracking-[0.08em] text-zinc-500">{product.category || 'Colecao Lua Active'}</p>
+        <p className="text-xs uppercase tracking-[0.08em] text-zinc-500">{product.category || 'Coleção Charme'}</p>
         <h3 className="text-lg font-semibold text-zinc-100">{product.name}</h3>
         <p className="text-2xl font-bold text-zinc-100">{formatPrice(product.price)}</p>
         <p className="text-sm text-zinc-400">{installmentCount}x de {formatPrice(installmentValue)}</p>
