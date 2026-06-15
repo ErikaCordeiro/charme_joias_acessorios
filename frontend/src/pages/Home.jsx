@@ -4,7 +4,18 @@ const whatsappHref =
   'https://wa.me/5548988006788?text=Ola!%20Vi%20a%20Charme%20Joias%20Acessorios%20e%20quero%20conhecer%20as%20colecoes.'
 
 const instagramHref = 'https://www.instagram.com/charmejoiass/'
-const heroImage = '/hero/charme-joias-hero.png'
+const logoImage = '/brand/charme-logo.jpeg'
+const productImages = {
+  hero: '/products/charme/conjunto-dourado-caixa.jpeg',
+  gold: '/products/charme/corrente-e-brincos-dourados.jpeg',
+  earrings: '/products/charme/brincos-organicos-dourados.jpeg',
+  silver: '/products/charme/conjunto-prata-ponto-luz.jpeg',
+  exclusive: '/products/charme/conjunto-coracao-dourado.jpeg',
+  red: '/products/charme/conjunto-vermelho-dourado.jpeg',
+  necklace: '/products/charme/colares-escapulario.jpeg',
+  laminated: '/products/charme/corrente-laminada-dourada.jpeg',
+}
+const heroImage = productImages.hero
 
 const menuItems = [
   ['JOIAS', '#colecoes'],
@@ -23,11 +34,11 @@ const pillars = [
   ['Detalhes que Encantam', 'Porque a sofisticação mora nos pequenos detalhes.'],
 ]
 
-function EditorialImage({ className = '', position = 'center' }) {
+function EditorialImage({ className = '', position = 'center', src = heroImage }) {
   return (
     <div className={`relative overflow-hidden bg-[#101827] ${className}`}>
       <img
-        src={heroImage}
+        src={src}
         alt="Semijoias douradas e prateadas da Charme em uma composição editorial"
         className="h-full w-full object-cover transition duration-700 ease-out hover:scale-[1.025]"
         style={{ objectPosition: position }}
@@ -127,10 +138,11 @@ function Home() {
             </a>
 
             <a href="#inicio" className="text-center">
-              <span className="block font-serif text-4xl leading-none tracking-[0.08em]">Charme</span>
-              <span className="mt-1.5 block text-[0.62rem] font-semibold uppercase tracking-[0.36em] text-[#101827]/58">
-                Joias Acessórios
-              </span>
+              <img
+                src={logoImage}
+                alt="Charme Joias e Acessórios"
+                className="mx-auto h-16 w-16 object-cover"
+              />
             </a>
 
             <div className="flex items-center justify-end gap-4">
@@ -153,10 +165,11 @@ function Home() {
               </svg>
             </button>
             <a href="#inicio" className="min-w-0 text-center">
-              <span className="block font-serif text-3xl leading-none tracking-[0.08em]">Charme</span>
-              <span className="mt-0.5 block text-[0.48rem] font-semibold uppercase tracking-[0.26em] text-[#101827]/58">
-                Joias Acessórios
-              </span>
+              <img
+                src={logoImage}
+                alt="Charme Joias e Acessórios"
+                className="mx-auto h-11 w-11 object-cover"
+              />
             </a>
             <div className="flex items-center justify-end text-[#101827]/68">
               <button type="button" onClick={() => setSearchOpen(true)} aria-label="Buscar" className="transition hover:text-[#0A6772]">
@@ -187,7 +200,7 @@ function Home() {
         <div className="hidden border-b border-[#101827]/8 bg-[#FAFAF8] lg:block">
           <div className="mx-auto grid max-w-7xl items-center gap-4 px-4 py-4 text-center sm:px-6 lg:grid-cols-[1fr_auto_1fr] lg:px-8">
             <div className="hidden h-16 overflow-hidden lg:block">
-              <img src={heroImage} alt="" className="h-full w-full object-cover opacity-75" style={{ objectPosition: '28% center' }} />
+              <img src={productImages.earrings} alt="" className="h-full w-full object-cover opacity-75" style={{ objectPosition: 'center' }} />
             </div>
             <div className="px-4">
               <p className="font-serif text-xl uppercase tracking-[0.28em] text-[#101827]/80 sm:text-2xl">Entrega Garantida</p>
@@ -196,7 +209,7 @@ function Home() {
               </p>
             </div>
             <div className="hidden h-16 overflow-hidden lg:block">
-              <img src={heroImage} alt="" className="h-full w-full object-cover opacity-75" style={{ objectPosition: '82% center' }} />
+              <img src={productImages.silver} alt="" className="h-full w-full object-cover opacity-75" style={{ objectPosition: 'center' }} />
             </div>
           </div>
         </div>
@@ -296,7 +309,7 @@ function Home() {
             </div>
 
             <article className="luxury-reveal grid items-center gap-10 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-              <EditorialImage className="min-h-[420px] lg:min-h-[500px]" position="42% center" />
+              <EditorialImage className="min-h-[420px] lg:min-h-[500px]" position="center" src={productImages.gold} />
               <div className="max-w-lg">
                 <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#C7A46A]">Coleção Ouro</p>
                 <h3 className="mt-5 font-serif text-4xl leading-tight sm:text-5xl">Luz quente, presença delicada.</h3>
@@ -320,12 +333,12 @@ function Home() {
                   <TextLink>Explorar</TextLink>
                 </div>
               </div>
-              <EditorialImage className="min-h-[420px] lg:order-2 lg:min-h-[500px]" position="72% center" />
+              <EditorialImage className="min-h-[420px] lg:order-2 lg:min-h-[500px]" position="center" src={productImages.silver} />
             </article>
 
             <article className="luxury-reveal relative mt-16 min-h-[560px] overflow-hidden bg-[#101827] text-white">
               <img
-                src={heroImage}
+                src={productImages.exclusive}
                 alt="Coleção exclusiva Charme em fotografia editorial"
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ objectPosition: 'center 54%' }}
@@ -352,7 +365,7 @@ function Home() {
                   <span className="mt-3 block text-[#C7A46A]">Ele revela quem você é.</span>
                 </h2>
               </div>
-              <EditorialImage className="min-h-[460px]" position="52% center" />
+              <EditorialImage className="min-h-[460px]" position="center" src={productImages.necklace} />
             </div>
           </div>
         </section>
@@ -388,10 +401,10 @@ function Home() {
             </div>
 
             <div className="grid min-h-[560px] gap-4 md:grid-cols-[1.25fr_0.75fr]">
-              <EditorialImage className="min-h-[420px]" position="45% center" />
+              <EditorialImage className="min-h-[420px]" position="center" src={productImages.red} />
               <div className="grid gap-4">
-                <EditorialImage className="min-h-[300px]" position="70% center" />
-                <EditorialImage className="min-h-[300px]" position="30% center" />
+                <EditorialImage className="min-h-[300px]" position="center" src={productImages.laminated} />
+                <EditorialImage className="min-h-[300px]" position="center" src={productImages.earrings} />
               </div>
             </div>
           </div>
@@ -422,10 +435,11 @@ function Home() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.25fr_0.85fr_0.85fr_0.85fr]">
             <div>
-              <p className="font-serif text-4xl tracking-[0.05em]">Charme</p>
-              <p className="mt-2 text-[0.65rem] font-semibold uppercase tracking-[0.32em] text-[#101827]/50">
-                Joias Acessórios
-              </p>
+              <img
+                src={logoImage}
+                alt="Charme Joias e Acessórios"
+                className="h-20 w-20 object-cover"
+              />
               <p className="mt-7 max-w-sm text-sm leading-7 text-[#101827]/60">
                 Elegância em cada detalhe. Peças selecionadas para mulheres que valorizam estilo e sofisticação.
               </p>
