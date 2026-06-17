@@ -8,17 +8,22 @@ function AdminProductForm({
   onUploadImage,
   uploadingImage = false,
 }) {
+  const inputClass =
+    'h-11 rounded-full border border-[#0A6772]/14 bg-[#FAFAF8] px-4 text-sm text-[#101827] outline-none transition placeholder:text-[#101827]/35 focus:border-[#0A6772] focus:bg-white focus:ring-4 focus:ring-[#0A6772]/10'
+  const textareaClass =
+    'rounded-[6px] border border-[#0A6772]/14 bg-[#FAFAF8] px-4 py-3 text-sm text-[#101827] outline-none transition placeholder:text-[#101827]/35 focus:border-[#0A6772] focus:bg-white focus:ring-4 focus:ring-[#0A6772]/10 md:col-span-2'
+
   return (
-    <section className="rounded-2xl border border-zinc-900 bg-zinc-950/70 p-5">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-zinc-100">
+    <section className="rounded-[6px] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_45px_rgba(10,103,114,0.06)]">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-serif text-2xl text-[#12343A]">
           {editing ? 'Editar produto' : 'Cadastrar produto'}
         </h2>
         {editing && (
           <button
             type="button"
             onClick={onCancelEdit}
-            className="rounded-full border border-zinc-700 px-4 py-2 text-xs font-semibold text-zinc-200 transition hover:border-zinc-500"
+            className="rounded-full border border-[#0A6772]/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#0A6772] transition hover:border-[#0A6772]"
           >
             Cancelar
           </button>
@@ -38,14 +43,14 @@ function AdminProductForm({
           onChange={(event) => onChange('name', event.target.value)}
           placeholder="Nome"
           required
-          className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+          className={inputClass}
         />
         <input
           type="text"
           value={form.category}
           onChange={(event) => onChange('category', event.target.value)}
           placeholder="Categoria"
-          className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+          className={inputClass}
         />
         <input
           type="number"
@@ -55,7 +60,7 @@ function AdminProductForm({
           onChange={(event) => onChange('price', event.target.value)}
           placeholder="Preco"
           required
-          className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+          className={inputClass}
         />
         <input
           type="number"
@@ -64,7 +69,7 @@ function AdminProductForm({
           onChange={(event) => onChange('stock', event.target.value)}
           placeholder="Estoque"
           required
-          className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+          className={inputClass}
         />
         <div className="grid gap-3 md:col-span-2 md:grid-cols-[1fr_auto]">
           <input
@@ -72,9 +77,9 @@ function AdminProductForm({
             value={form.image_url}
             onChange={(event) => onChange('image_url', event.target.value)}
             placeholder="URL da imagem Cloudinary"
-            className="h-11 rounded-xl border border-zinc-800 bg-black/70 px-3 text-sm text-zinc-100 outline-none transition focus:border-zinc-500"
+            className={inputClass}
           />
-          <label className="inline-flex h-11 cursor-pointer items-center justify-center rounded-xl border border-zinc-700 px-4 text-xs font-semibold text-zinc-200 transition hover:border-zinc-500">
+          <label className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-[#0A6772]/20 px-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#0A6772] transition hover:border-[#0A6772]">
             {uploadingImage ? 'Enviando...' : 'Upload Cloudinary'}
             <input
               type="file"
@@ -96,13 +101,13 @@ function AdminProductForm({
           onChange={(event) => onChange('description', event.target.value)}
           placeholder="Descricao"
           rows={3}
-          className="rounded-xl border border-zinc-800 bg-black/70 px-3 py-2 text-sm text-zinc-100 outline-none transition focus:border-zinc-500 md:col-span-2"
+          className={textareaClass}
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="h-11 rounded-full bg-zinc-300 px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200 disabled:opacity-60 md:col-span-2"
+          className="h-11 rounded-full bg-[#0A6772] px-5 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#095c65] disabled:opacity-60 md:col-span-2"
         >
           {loading ? 'Salvando...' : editing ? 'Atualizar produto' : 'Cadastrar produto'}
         </button>

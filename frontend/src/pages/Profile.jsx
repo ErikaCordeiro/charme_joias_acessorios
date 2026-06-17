@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import AccountField from '../components/AccountField'
 import {
@@ -8,6 +9,8 @@ import {
   getUserProfileFormValues,
   userProfileFields,
 } from '../helpers/userProfile'
+import { formatPrice } from '../helpers/price'
+import { clearStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
 function Profile() {
@@ -18,6 +21,7 @@ function Profile() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -35,6 +39,12 @@ function Profile() {
         setOrders(ordersRes.data)
       } catch (err) {
         console.error('Erro ao carregar perfil:', err)
+        const status = err?.response?.status
+        if (status === 401 || status === 403) {
+          clearStoredToken()
+          navigate('/login')
+          return
+        }
         const message = err?.response?.data?.detail || err?.message || 'Nao foi possivel carregar seus dados.'
         setError(message)
       } finally {
@@ -43,7 +53,7 @@ function Profile() {
     }
 
     fetchProfileData()
-  }, [])
+  }, [navigate])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -51,6 +61,11 @@ function Profile() {
       ...currentForm,
       [name]: value,
     }))
+  }
+
+  const handleLogout = () => {
+    clearStoredToken()
+    navigate('/login')
   }
 
   const handleSubmit = async (event) => {
@@ -68,150 +83,139 @@ function Profile() {
       console.error('Erro ao salvar perfil:', saveError)
       const serverMessage = saveError?.response?.data?.detail
       const status = saveError?.response?.status
-      const axiosMessage = saveError?.message
-      setError(
-        serverMessage
-          ? `Erro ${status}: ${serverMessage}`
-          : axiosMessage
-            ? `Erro de conexao: ${axiosMessage}`
-            : 'Nao foi possivel salvar seus dados.'
-      )
+      setError(serverMessage ? `Erro ${status}: ${serverMessage}` : 'Nao foi possivel salvar seus dados.')
     } finally {
       setSaving(false)
     }
   }
 
+  if (loading) {
+    return (
+      <div className="rounded-[1.5rem] border border-[#0A6772]/12 bg-white p-8 text-center text-[#101827]/65 shadow-[0_18px_50px_rgba(16,24,39,0.06)]">
+        Carregando sua conta...
+      </div>
+    )
+  }
+
+  if (error && !user) {
+    return (
+      <div className="rounded-[1.5rem] border border-red-500/20 bg-red-50 p-6 text-sm text-red-700">
+        {error}
+      </div>
+    )
+  }
+
   return (
-    <section className="mx-auto max-w-6xl rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 shadow-soft">
-      <div className="flex flex-col gap-6">
-        <div className="rounded-3xl border border-zinc-900 bg-black/70 p-6">
-          <h1 className="text-3xl font-semibold text-white">Minha Conta</h1>
-          <p className="mt-2 text-zinc-400">Mantenha nome, CPF, telefone e endereco sempre atualizados.</p>
+    <section className="space-y-8">
+      <div className="rounded-[1.75rem] border border-[#0A6772]/12 bg-white p-6 shadow-[0_18px_50px_rgba(16,24,39,0.06)] sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#0A6772]">Área do cliente</p>
+        <h1 className="mt-3 font-serif text-4xl font-semibold leading-tight text-[#101827] sm:text-5xl">Minha Conta</h1>
+        <p className="mt-3 max-w-2xl text-base leading-7 text-[#101827]/62">
+          Gerencie seus dados, pedidos e informações pessoais.
+        </p>
+      </div>
+
+      {success && <div className="rounded-2xl border border-emerald-500/20 bg-emerald-50 p-4 text-sm text-emerald-700">{success}</div>}
+      {error && <div className="rounded-2xl border border-red-500/20 bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+
+      {user && (
+        <div className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
+          <form onSubmit={handleSubmit} className="rounded-[1.5rem] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_50px_rgba(16,24,39,0.05)] sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 className="font-serif text-2xl font-semibold text-[#101827]">Dados cadastrais</h2>
+                <p className="mt-2 text-sm leading-6 text-[#101827]/58">Atualize os dados usados na sua conta e nos pedidos.</p>
+              </div>
+              <button
+                type="submit"
+                disabled={saving}
+                className="h-11 rounded-full bg-[#0A6772] px-6 text-sm font-bold text-white transition hover:bg-[#08545d] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {saving ? 'Salvando...' : 'Salvar dados'}
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              <AccountField
+                label="E-mail"
+                name="email"
+                type="email"
+                value={user.email}
+                onChange={undefined}
+                autoComplete="email"
+                disabled
+                readOnly
+              />
+
+              {userProfileFields.map((field) => (
+                <AccountField
+                  key={field.name}
+                  label={field.label}
+                  name={field.name}
+                  value={form[field.name]}
+                  onChange={handleChange}
+                  placeholder={field.placeholder}
+                  autoComplete={field.autoComplete}
+                  required={field.required ?? true}
+                  maxLength={field.maxLength}
+                />
+              ))}
+            </div>
+          </form>
+
+          <aside className="space-y-6">
+            <div className="rounded-[1.5rem] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_50px_rgba(16,24,39,0.05)] sm:p-6">
+              <h2 className="font-serif text-2xl font-semibold text-[#101827]">Endereço principal</h2>
+              <p className="mt-4 rounded-2xl bg-[#FAFAF8] p-4 text-sm leading-7 text-[#101827]/68">
+                {formatFullAddress(user) || 'Nenhum endereço informado.'}
+              </p>
+            </div>
+
+            <div className="rounded-[1.5rem] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_50px_rgba(16,24,39,0.05)] sm:p-6">
+              <h2 className="font-serif text-2xl font-semibold text-[#101827]">Segurança da conta</h2>
+              <div className="mt-5 grid gap-3">
+                <button type="button" className="h-11 rounded-full border border-[#0A6772]/20 px-5 text-sm font-semibold text-[#0A6772] transition hover:border-[#0A6772]">
+                  Alterar senha
+                </button>
+                <button type="button" onClick={handleLogout} className="h-11 rounded-full bg-[#101827] px-5 text-sm font-semibold text-white transition hover:bg-[#0A6772]">
+                  Sair da conta
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      <div className="rounded-[1.5rem] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_50px_rgba(16,24,39,0.05)] sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="font-serif text-2xl font-semibold text-[#101827]">Meus pedidos</h2>
+            <p className="mt-2 text-sm text-[#101827]/58">Acompanhe status, valores e histórico de compras.</p>
+          </div>
         </div>
 
-        {loading ? (
-          <div className="rounded-3xl border border-zinc-900 bg-black/70 p-6 text-zinc-300">Carregando seus dados...</div>
-        ) : error ? (
-          <div className="rounded-3xl border border-red-500/20 bg-red-500/10 p-6 text-sm text-red-200">{error}</div>
+        {orders.length === 0 ? (
+          <div className="mt-6 rounded-2xl border border-[#0A6772]/10 bg-[#FAFAF8] p-6 text-sm text-[#101827]/62">
+            Você ainda não fez nenhum pedido.
+          </div>
         ) : (
-          <>
-            {success && <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">{success}</div>}
-
-            {user && (
-              <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-                <form onSubmit={handleSubmit} className="rounded-3xl border border-zinc-900 bg-black/70 p-6">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-semibold text-white">Dados cadastrais</h2>
-                      <p className="mt-2 text-zinc-400">Atualize os dados usados na sua conta e nos pedidos.</p>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="rounded-full bg-zinc-300 px-5 py-2 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {saving ? 'Salvando...' : 'Salvar dados'}
-                    </button>
+          <div className="mt-6 grid gap-4">
+            {orders.map((order) => (
+              <article key={order.id} className="rounded-2xl border border-[#0A6772]/10 bg-[#FAFAF8] p-4">
+                <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0A6772]">Pedido #{order.id}</p>
+                    <p className="mt-2 text-sm text-[#101827]/60">{new Date(order.created_at).toLocaleString('pt-BR')}</p>
                   </div>
-
-                  <div className="mt-6 grid gap-5 md:grid-cols-2">
-                    <AccountField
-                      label="Email"
-                      name="email"
-                      type="email"
-                      value={user.email}
-                      onChange={undefined}
-                      autoComplete="email"
-                      disabled
-                      readOnly
-                    />
-
-                    {userProfileFields.map((field) => (
-                      <AccountField
-                        key={field.name}
-                        label={field.label}
-                        name={field.name}
-                        value={form[field.name]}
-                        onChange={handleChange}
-                        placeholder={field.placeholder}
-                        autoComplete={field.autoComplete}
-                        required={field.required ?? true}
-                        maxLength={field.maxLength}
-                      />
-                    ))}
-                  </div>
-                </form>
-
-                <div className="rounded-3xl border border-zinc-900 bg-black/70 p-6">
-                  <h2 className="text-xl font-semibold text-white">Resumo da conta</h2>
-                  <div className="mt-5 space-y-4">
-                    <div className="rounded-3xl bg-zinc-950 p-4 text-zinc-200">
-                      <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Email</p>
-                      <p className="mt-2 text-base font-medium text-white">{user.email}</p>
-                    </div>
-                    <div className="rounded-3xl bg-zinc-950 p-4 text-zinc-200">
-                      <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Nome</p>
-                      <p className="mt-2 text-base font-medium text-white">{user.full_name || 'Nao informado'}</p>
-                    </div>
-                    <div className="rounded-3xl bg-zinc-950 p-4 text-zinc-200">
-                      <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Telefone</p>
-                      <p className="mt-2 text-base font-medium text-white">{user.phone || 'Nao informado'}</p>
-                    </div>
-                    <div className="rounded-3xl bg-zinc-950 p-4 text-zinc-200">
-                      <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">CPF</p>
-                      <p className="mt-2 text-base font-medium text-white">{user.cpf || 'Nao informado'}</p>
-                    </div>
-                    <div className="rounded-3xl bg-zinc-950 p-4 text-zinc-200">
-                      <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Endereco completo</p>
-                      <p className="mt-2 text-base font-medium text-white">{formatFullAddress(user) || 'Nao informado'}</p>
-                    </div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#101827]/70">Status: {order.status}</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#101827]/70">Total: {formatPrice(order.total)}</span>
+                    <button type="button" className="rounded-full bg-[#0A6772] px-4 py-1 text-xs font-semibold text-white">Ver detalhes</button>
                   </div>
                 </div>
-              </div>
-            )}
-
-            <div className="rounded-3xl border border-zinc-900 bg-black/70 p-6">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-white">Pedidos</h2>
-                  <p className="mt-2 text-zinc-400">Veja o historico de compras feitas com esta conta.</p>
-                </div>
-              </div>
-
-              {orders.length === 0 ? (
-                <div className="mt-6 rounded-3xl border border-zinc-900 bg-zinc-950 p-6 text-zinc-300">
-                  Voce ainda nao fez nenhum pedido.
-                </div>
-              ) : (
-                <div className="mt-6 space-y-6">
-                  {orders.map((order) => (
-                    <div key={order.id} className="rounded-3xl border border-zinc-900 bg-zinc-950 p-6">
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Pedido</p>
-                          <p className="mt-1 text-lg font-semibold text-white">#{order.id}</p>
-                        </div>
-                        <div className="grid gap-2 sm:grid-flow-col sm:auto-cols-max">
-                          <span className="rounded-full bg-black px-3 py-1 text-sm text-zinc-300">Status: {order.status}</span>
-                          <span className="rounded-full bg-black px-3 py-1 text-sm text-zinc-300">Total: R${order.total.toFixed(2)}</span>
-                        </div>
-                      </div>
-
-                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                        {order.items.map((item) => (
-                          <div key={item.id} className="rounded-3xl bg-black p-4 text-zinc-200">
-                            <p className="text-sm uppercase tracking-[0.2em] text-zinc-500">Item #{item.product_id}</p>
-                            <p className="mt-2 text-base font-medium text-white">Quantidade: {item.quantity}</p>
-                            <p className="mt-1 text-sm text-zinc-400">Preco no pedido: R${item.price_at_time.toFixed(2)}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </>
+              </article>
+            ))}
+          </div>
         )}
       </div>
     </section>

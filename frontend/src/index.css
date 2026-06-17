@@ -22,8 +22,13 @@ html {
 body {
     margin: 0;
     min-height: 100vh;
+    overflow-x: hidden;
     background: #fbf8f1;
     color: #111226;
+}
+
+img {
+    max-width: 100%;
 }
 
 #root {

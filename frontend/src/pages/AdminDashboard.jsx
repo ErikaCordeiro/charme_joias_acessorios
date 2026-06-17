@@ -12,6 +12,8 @@ import { formatPrice } from '../helpers/price'
 import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
+const adminSections = ['Dashboard', 'Produtos', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
+
 function AdminDashboard() {
   const token = getStoredToken()
   const navigate = useNavigate()
@@ -182,41 +184,71 @@ function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-zinc-300">
+      <div className="rounded-[6px] border border-[#0A6772]/12 bg-white p-8 text-[#101827]/64 shadow-[0_18px_45px_rgba(10,103,114,0.06)]">
         Carregando dashboard admin...
       </div>
     )
   }
 
+  const averageTicket =
+    metrics?.paid_orders > 0 ? metrics.paid_sales_amount / metrics.paid_orders : 0
+
   return (
     <section className="space-y-6">
-      <header className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6">
-        <h1 className="text-3xl font-semibold text-zinc-100">Dashboard Admin</h1>
-        <p className="mt-2 text-zinc-400">Gestao de pedidos, produtos, clientes, vendas e carrinhos abandonados.</p>
+      <header className="rounded-[6px] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_45px_rgba(10,103,114,0.06)] sm:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#B98D3A]">Charme Admin</p>
+            <h1 className="mt-2 font-serif text-3xl text-[#12343A] sm:text-4xl">Dashboard Admin</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#101827]/62">
+              Gestao de pedidos, produtos, clientes, vendas e carrinhos abandonados em uma area clara e responsiva.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={loadAdminData}
+            className="h-11 rounded-full border border-[#0A6772]/20 px-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#0A6772] transition hover:border-[#0A6772]"
+          >
+            Atualizar
+          </button>
+        </div>
+
+        <nav className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {adminSections.map((section) => (
+            <a
+              key={section}
+              href={section === 'Dashboard' ? '#dashboard' : `#${section.toLowerCase()}`}
+              className="shrink-0 rounded-full border border-[#0A6772]/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#101827]/62 transition hover:border-[#0A6772]/35 hover:text-[#0A6772]"
+            >
+              {section}
+            </a>
+          ))}
+        </nav>
       </header>
 
       {error && (
-        <div className="rounded-2xl border border-red-500/30 bg-red-950/40 p-4 text-sm text-red-200">
+        <div className="rounded-[6px] border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           {error}
         </div>
       )}
       {success && (
-        <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/40 p-4 text-sm text-emerald-200">
+        <div className="rounded-[6px] border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
           {success}
         </div>
       )}
 
       {metrics && (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div id="dashboard" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
           <AdminMetricCard title="Pedidos" value={metrics.total_orders} subtitle={`${metrics.paid_orders} pagos`} />
           <AdminMetricCard title="Vendas" value={formatPrice(metrics.total_sales_amount)} subtitle={`${formatPrice(metrics.paid_sales_amount)} pagas`} />
+          <AdminMetricCard title="Ticket medio" value={formatPrice(averageTicket)} subtitle="pedidos pagos" />
           <AdminMetricCard title="Clientes" value={metrics.total_customers} />
           <AdminMetricCard title="Produtos" value={metrics.total_products} />
           <AdminMetricCard title="Abandonados" value={metrics.abandoned_carts} subtitle={`${metrics.abandoned_items} itens`} />
         </div>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+      <div id="produtos" className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <AdminProductForm
           form={productForm}
           loading={savingProduct}
@@ -238,8 +270,12 @@ function AdminDashboard() {
         onDelete={handleDeleteProduct}
       />
 
-      <AdminOrdersTable orders={orders} />
-      <AdminCustomersTable customers={customers} />
+      <div id="pedidos">
+        <AdminOrdersTable orders={orders} />
+      </div>
+      <div id="clientes">
+        <AdminCustomersTable customers={customers} />
+      </div>
     </section>
   )
 }
