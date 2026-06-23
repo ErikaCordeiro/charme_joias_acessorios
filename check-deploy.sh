@@ -1,39 +1,41 @@
 #!/bin/bash
 
-# Script de verificação pré-deploy
+set -euo pipefail
 
-echo "🔍 Verificando configuração do projeto Lua Active..."
+echo "Checking Charme Joias production readiness..."
 
-# Verifica se arquivos essenciais existem
-files=("requirements.txt" "app/main.py" "alembic.ini" "frontend/package.json")
-for file in "${files[@]}"; do
+required_files=(
+    ".env.example"
+    "requirements.txt"
+    "app/main.py"
+    "alembic.ini"
+    "alembic/env.py"
+    "frontend/package.json"
+    "render.yaml"
+    "scripts/create_admin_local.py"
+)
+
+for file in "${required_files[@]}"; do
     if [ ! -f "$file" ]; then
-        echo "❌ Arquivo $file não encontrado!"
+        echo "Missing required file: $file"
         exit 1
     fi
 done
 
-echo "✅ Arquivos essenciais encontrados"
-
-# Verifica se .env existe
-if [ ! -f ".env" ]; then
-    echo "⚠️  Arquivo .env não encontrado. Copiando .env.example..."
-    cp .env.example .env
-    echo "✅ Arquivo .env criado. Configure as variáveis!"
+if git ls-files | grep -E '^\.env($|\.|-)'; then
+    echo "Tracked .env file detected. Remove secrets before deploy."
+    exit 1
 fi
 
-# Verifica se Docker está disponível
-if command -v docker &> /dev/null; then
-    echo "✅ Docker disponível"
-else
-    echo "⚠️  Docker não encontrado. Considere usar Railway ou Heroku"
+if grep -R "Railway\|Supabase\|sb_publishable\|charme123456\|Admin123" \
+    --exclude-dir=.git \
+    --exclude-dir=node_modules \
+    --exclude-dir=venv \
+    --exclude-dir=dist \
+    --exclude=check-deploy.sh \
+    .; then
+    echo "Legacy provider reference or unsafe credential found."
+    exit 1
 fi
 
-# Verifica se Railway CLI está disponível
-if command -v railway &> /dev/null; then
-    echo "✅ Railway CLI disponível"
-else
-    echo "ℹ️  Railway CLI não encontrado. Instale com: npm install -g @railway/cli"
-fi
-
-echo "🎉 Verificação concluída! Projeto pronto para deploy."
+echo "Pre-deploy checks passed for Render + Neon."

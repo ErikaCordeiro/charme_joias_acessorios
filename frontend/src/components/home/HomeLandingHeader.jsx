@@ -26,15 +26,15 @@ function HomeLandingHeader() {
         <Link to="/" className="shrink-0 font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl">
           Charme
           <span className="block text-[0.34em] font-sans font-bold uppercase tracking-[0.24em] text-white/75">
-            Joias Acessórios
+            Joias Acessorios
           </span>
         </Link>
 
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold uppercase tracking-[0.08em] text-zinc-200">
           <Link to="/" className="border-b-2 border-zinc-200 pb-1 text-white">Inicio</Link>
           <Link to="/products" className="pb-1 transition hover:text-white">Produtos</Link>
-          <Link to="/products?category=semijoias" className="pb-1 transition hover:text-white">Categorias</Link>
-          <Link to="/products" className="pb-1 transition hover:text-white">Lançamentos</Link>
+          <Link to="/products" className="pb-1 transition hover:text-white">Categorias</Link>
+          <Link to="/products" className="pb-1 transition hover:text-white">Lancamentos</Link>
           <Link to="/products" className="pb-1 transition hover:text-white">Colecoes</Link>
           <Link to="/about" className="pb-1 transition hover:text-white">Sobre nos</Link>
         </nav>
