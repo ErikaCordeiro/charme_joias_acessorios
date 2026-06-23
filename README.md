@@ -1,195 +1,141 @@
 # Charme Joias e Acessorios
 
-E-commerce premium da Charme Joias e Acessorios, preparado para producao com:
+E-commerce em React + Vite com API FastAPI, SQLAlchemy assincorno e PostgreSQL.
 
-- Frontend: Vercel
-- Backend/API: Railway
-- Banco de dados: PostgreSQL no Railway
-- Imagens e midia: Cloudinary
+## Producao
+
+- Banco: Neon PostgreSQL
+- API: Render Web Service
+- Frontend: Render Static Site
+- Midia: Cloudinary
+
+O passo a passo completo esta em [DEPLOY.md](DEPLOY.md).
 
 ## Estrutura
 
 ```txt
-app/              FastAPI, routers, models, schemas e services
-alembic/          Migrations do PostgreSQL
-frontend/         React + Vite para deploy na Vercel
-scripts/          Scripts de seed, limpeza e criacao de admin local
-railway.toml      Configuracao do backend no Railway
-vercel.json       Configuracao do frontend na Vercel
+app/          API, modelos, schemas, routers e services
+alembic/      migrations PostgreSQL
+frontend/     React + Vite
+scripts/      seed, admin e manutencao do catalogo
+render.yaml   Blueprint do Render
 ```
 
-## Ambiente Local
+## Ambiente local
 
 Backend:
 
-```bash
+```powershell
 python -m venv venv
-venv\Scripts\activate
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-copy .env.example .env
+Copy-Item .env.example .env
 alembic upgrade head
-python scripts/create_admin_local.py
 uvicorn app.main:app --reload
 ```
 
 Frontend:
 
-```bash
-cd frontend
+```powershell
+Set-Location frontend
 npm ci
-copy .env.example .env
+Copy-Item .env.example .env
 npm run dev
 ```
 
-URLs locais:
+URLs:
 
 - Frontend: `http://localhost:5173`
-- Backend: `http://localhost:8000`
+- API: `http://localhost:8000`
 - API v1: `http://localhost:8000/api/v1`
-- Health check: `http://localhost:8000/healthz`
+- Health: `http://localhost:8000/healthz`
+- Banco: `http://localhost:8000/readyz`
 - Docs: `http://localhost:8000/docs`
 
-## Variaveis de Ambiente
+## Variaveis do backend
 
-Backend no Railway:
+Use `.env.example` como base:
 
 ```env
-APP_NAME=Charme Joias Acessorios
-API_V1_PREFIX=/api/v1
-DATABASE_URL=${{ Postgres.DATABASE_URL }}
-SECRET_KEY=<secret-forte-gerado-no-railway>
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
+DATABASE_URL=postgresql://usuario:senha@ep-exemplo-pooler.regiao.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+SECRET_KEY=<segredo-aleatorio-com-32-ou-mais-caracteres>
 ENVIRONMENT=production
-ADMIN_EMAILS=admin@seudominio.com
-CORS_ORIGINS=https://www.seudominio.com,https://seu-projeto.vercel.app
-FRONTEND_URL=https://www.seudominio.com
+ADMIN_EMAILS=cjoiaseacessorios@gmail.com
+CORS_ORIGINS=https://seu-frontend.onrender.com
+FRONTEND_URL=https://seu-frontend.onrender.com
+AUTO_CREATE_SCHEMA=false
 SEED_DEFAULT_PRODUCTS=false
-CLOUDINARY_CLOUD_NAME=<cloud-name>
-CLOUDINARY_API_KEY=<api-key>
-CLOUDINARY_API_SECRET=<api-secret>
-CLOUDINARY_DEFAULT_FOLDER=charme/produtos
-SENTRY_DSN=
 ```
 
-Frontend na Vercel:
+Em producao, a aplicacao recusa iniciar com secret fraco, CORS `*`, origem localhost, banco nao PostgreSQL ou admin nao configurado.
+
+## Variaveis do frontend
 
 ```env
-VITE_API_BASE_URL=https://sua-api.up.railway.app/api/v1
-VITE_SITE_URL=https://www.seudominio.com
+VITE_API_BASE_URL=https://sua-api.onrender.com/api/v1
+VITE_SITE_URL=https://seu-frontend.onrender.com
 VITE_SITE_NAME=Charme Joias e Acessorios
 ```
 
-Nunca coloque `DATABASE_URL`, `SECRET_KEY`, `CLOUDINARY_API_SECRET` ou qualquer outro segredo no frontend.
+Somente valores publicos usam o prefixo `VITE_`. Credenciais Neon, JWT e Cloudinary nunca devem ir para o frontend.
 
-## PostgreSQL e Migrations
+## Migrations
 
-Rodar migrations localmente:
-
-```bash
+```powershell
 alembic upgrade head
+alembic current
+alembic heads
 ```
 
-Rodar migrations em producao no Railway:
+As migrations usam exclusivamente `DATABASE_URL`. Em producao, `AUTO_CREATE_SCHEMA=false` deixa o Alembic como fonte de verdade do schema.
 
-```bash
-railway run alembic upgrade head
-```
+## Admin principal
 
-Criar nova migration:
-
-```bash
-alembic revision --autogenerate -m "descricao_da_migration"
-```
-
-O banco de producao deve usar `DATABASE_URL` do PostgreSQL Railway. Mantenha ambientes local e producao separados.
-
-## Cloudinary
-
-O projeto nao deve salvar imagens em disco local em producao. Uploads passam pelo backend e retornam `secure_url` do Cloudinary.
-
-Pastas recomendadas:
-
-- `charme/produtos`
-- `charme/banners`
-- `charme/categorias`
-
-Endpoint administrativo:
-
-```txt
-POST /api/v1/media/upload
-```
-
-Use imagens em HTTPS e prefira WebP/otimizacao via Cloudinary quando publicar novos produtos, banners e categorias.
-
-## Deploy Backend no Railway
-
-1. Crie um projeto no Railway.
-2. Adicione PostgreSQL ao projeto.
-3. Conecte este repositorio como servico backend.
-4. Configure as variaveis do backend.
-5. Garanta que `DATABASE_URL` aponte para o PostgreSQL do Railway.
-6. Configure o start command, se necessario:
-
-```bash
-uvicorn app.main:app --host 0.0.0.0 --port $PORT
-```
-
-7. Rode as migrations:
-
-```bash
-railway run alembic upgrade head
-```
-
-8. Teste:
-
-```txt
-https://sua-api.up.railway.app/healthz
-```
-
-## Deploy Frontend na Vercel
-
-1. Importe o repositorio na Vercel.
-2. Use:
-
-```txt
-Build Command: cd frontend && npm ci && npm run build
-Output Directory: frontend/dist
-```
-
-3. Configure as variaveis do frontend.
-4. Aponte `VITE_API_BASE_URL` para a API Railway com `/api/v1`.
-5. Configure o dominio customizado na Vercel.
-6. Inclua o dominio final em `CORS_ORIGINS` e `FRONTEND_URL` no Railway.
-
-## Admin
-
-Crie ou atualize o admin local:
-
-```bash
+```powershell
+$env:ADMIN_EMAIL='cjoiaseacessorios@gmail.com'
 python scripts/create_admin_local.py
 ```
 
-Em producao, defina `ADMIN_EMAILS` no Railway e crie o usuario admin com senha forte. Rotas administrativas exigem token e permissao de admin no backend.
+O script usa o banco configurado em `DATABASE_URL`, solicita uma senha forte e grava somente o hash bcrypt. Cadastro publico nunca concede role admin.
 
-## Seguranca
+## Seguranca aplicada
 
-- Rotas internas no frontend exigem login.
-- Rotas administrativas exigem usuario admin no backend.
-- CORS deve listar somente dominios confiaveis em producao.
-- Secrets ficam apenas no Railway.
-- Cloudinary API secret nunca vai para a Vercel.
-- Use HTTPS nos dominios finais.
-- Nao commitar `.env`, logs, bancos locais, chaves ou credenciais reais.
+- JWT com expiracao e secret obrigatorio em producao.
+- Hash bcrypt; hashes legados sao atualizados no proximo login.
+- Rotas administrativas verificam `is_admin` no backend.
+- Status de pedidos somente pode ser alterado por admin.
+- Frete e total do pedido sao recalculados no backend.
+- Estoque e pedido sao atualizados na mesma transacao.
+- Uploads exigem admin, tipo/tamanho validos e pastas permitidas.
+- CORS restrito em producao.
+- API publica somente sob `/api/v1`, exceto health/docs.
+- Logs nao incluem query string, token ou corpo da requisicao.
 
-## Checklist de Producao
+## Testes antes do deploy
 
-- `npm run lint` passa em `frontend/`.
-- `npm run build` passa em `frontend/`.
-- `pip install -r requirements.txt` passa no backend.
-- `alembic upgrade head` executado no PostgreSQL Railway.
-- `/healthz` retorna status OK.
-- `VITE_API_BASE_URL` aponta para `https://...railway.app/api/v1`.
-- `CORS_ORIGINS` inclui Vercel e dominio customizado.
-- Upload Cloudinary testado no admin.
-- Produtos usam URLs seguras de imagem.
+```powershell
+pip install -r requirements.txt
+alembic upgrade head
+python -m compileall app scripts alembic
+
+Set-Location frontend
+npm ci
+npm run lint
+npm run build
+```
+
+Teste manualmente:
+
+1. `/healthz`, `/readyz` e `/docs`.
+2. Listagem e filtros de produtos.
+3. Cadastro e login.
+4. Carrinho e checkout.
+5. Minha Conta e pedidos.
+6. Negacao de `/api/v1/admin/*` para cliente comum.
+7. Dashboard com o admin principal.
+
+## Limites atuais
+
+- Pagamentos sao simulados em sandbox e nao podem receber vendas reais.
+- Rate limiting distribuido e recuperacao de senha ainda devem ser adicionados antes de uma operacao comercial de maior escala.
+- Cloudinary precisa ser configurado no Render para uploads administrativos.

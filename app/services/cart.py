@@ -41,7 +41,13 @@ class CartService:
         )
         existing_item = result.scalars().first()
         if existing_item:
-            existing_item.quantity += item_data.quantity
+            next_quantity = existing_item.quantity + item_data.quantity
+            if product.stock < next_quantity:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient stock",
+                )
+            existing_item.quantity = next_quantity
         else:
             cart_item = CartItem(cart_id=cart.id, product_id=item_data.product_id, quantity=item_data.quantity)
             self.db.add(cart_item)

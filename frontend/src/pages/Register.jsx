@@ -38,7 +38,7 @@ function Register() {
         password,
         ...buildUserProfilePayload(form),
       })
-      setSuccess('Cadastro concluído com sucesso. Faça login para continuar.')
+      setSuccess('Cadastro concluido com sucesso. Faca login para continuar.')
       setTimeout(() => navigate('/login'), 1200)
     } catch (registerError) {
       console.error('Erro no registro:', registerError)
@@ -46,11 +46,11 @@ function Register() {
       const status = registerError?.response?.status
       const axiosMessage = registerError?.message
       setError(
-        serverMessage
+        typeof serverMessage === 'string'
           ? `Erro ${status}: ${serverMessage}`
           : axiosMessage
             ? `Erro de conexao: ${axiosMessage}`
-            : 'Não foi possível completar o cadastro. Revise os dados e tente novamente.'
+            : 'Nao foi possivel completar o cadastro. Revise os dados e tente novamente.'
       )
     } finally {
       setLoading(false)
@@ -83,7 +83,9 @@ function Register() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="new-password"
-            placeholder="Mínimo de 6 caracteres"
+            placeholder="Minimo de 10 caracteres, com letras e numeros"
+            minLength={10}
+            maxLength={72}
           />
         </div>
 

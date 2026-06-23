@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
@@ -7,17 +7,23 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.core.config import settings
+from app.database import get_async_session
 from app.models import User
 
-if TYPE_CHECKING:
-    from app.database import get_async_session
-
-pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+pwd_context = CryptContext(
+    schemes=["bcrypt", "sha256_crypt"],
+    deprecated=["sha256_crypt"],
+    bcrypt__rounds=12,
+)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_PREFIX}/auth/login")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
+
+
+def password_needs_rehash(hashed_password: str) -> bool:
+    return pwd_context.needs_update(hashed_password)
 
 
 def get_password_hash(password: str) -> str:
@@ -46,27 +52,25 @@ def verify_token(token: str, credentials_exception):
         raise credentials_exception
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(lambda: None)) -> User:
-    # Import here to avoid circular import
-    from app.database import get_async_session
-    
-    # Get the actual session
-    async for session in get_async_session():
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        email = verify_token(token, credentials_exception)
-        result = await session.execute(select(User).where(User.email == email))
-        user = result.scalars().first()
-        if user is None:
-            raise credentials_exception
-        return user
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_async_session),
+) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    email = verify_token(token, credentials_exception)
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalars().first()
+    if user is None:
+        raise credentials_exception
+    return user
 
 
 async def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
-    if current_user.is_admin or settings.is_admin_email(current_user.email):
+    if current_user.is_admin:
         return current_user
 
     raise HTTPException(

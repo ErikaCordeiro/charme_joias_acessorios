@@ -1,20 +1,17 @@
-databases:
-  - name: charme-joias-db
-    plan: free
-
 services:
   - type: web
     name: charme-joias-api
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /healthz
+    autoDeployTrigger: commit
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
       - key: DATABASE_URL
-        fromDatabase:
-          name: charme-joias-db
-          property: connectionString
+        sync: false
       - key: SECRET_KEY
         generateValue: true
       - key: ENVIRONMENT
@@ -28,13 +25,23 @@ services:
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: "60"
       - key: ADMIN_EMAILS
-        value: erikagcordeiro25@gmail.com
+        value: cjoiaseacessorios@gmail.com
       - key: CORS_ORIGINS
-        value: https://your-vercel-domain.vercel.app
+        sync: false
       - key: FRONTEND_URL
-        value: https://your-vercel-domain.vercel.app
+        sync: false
       - key: SEED_DEFAULT_PRODUCTS
         value: "false"
+      - key: AUTO_CREATE_SCHEMA
+        value: "false"
+      - key: DB_POOL_SIZE
+        value: "5"
+      - key: DB_MAX_OVERFLOW
+        value: "5"
+      - key: DB_POOL_TIMEOUT
+        value: "30"
+      - key: DB_POOL_RECYCLE
+        value: "300"
       - key: SENTRY_DSN
         sync: false
       - key: CLOUDINARY_CLOUD_NAME
@@ -52,11 +59,16 @@ services:
     rootDir: frontend
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
+    autoDeployTrigger: commit
     envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
       - key: VITE_API_BASE_URL
         sync: false
       - key: VITE_SITE_URL
         sync: false
+      - key: VITE_SITE_NAME
+        value: Charme Joias e Acessorios
     routes:
       - type: rewrite
         source: /*

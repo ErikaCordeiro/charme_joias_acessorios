@@ -4,7 +4,7 @@ from typing import List
 from app.database import get_async_session
 from app.schemas.order import OrderCreate, OrderUpdate, OrderResponse, OrderCheckoutResponse
 from app.services.order import OrderService
-from app.core.security import get_current_user
+from app.core.security import get_current_admin_user, get_current_user
 from app.models import User
 
 router = APIRouter(prefix="/orders", tags=["orders"])
@@ -43,10 +43,11 @@ async def get_order(
     return order
 
 
-@router.put("/{order_id}", response_model=OrderResponse, dependencies=[Depends(get_current_user)])
+@router.put("/{order_id}", response_model=OrderResponse)
 async def update_order_status(
     order_id: int,
     order_data: OrderUpdate,
+    _current_admin: User = Depends(get_current_admin_user),
     db: AsyncSession = Depends(get_async_session)
 ):
     order_service = OrderService(db)

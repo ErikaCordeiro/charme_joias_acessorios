@@ -69,7 +69,7 @@ export const validatePaymentForm = (paymentMethod, paymentForm) => {
   return ''
 }
 
-export const buildPaymentPayload = (paymentMethod, paymentForm, freightTotal) => {
+export const buildPaymentPayload = (paymentMethod, paymentForm, shippingCep) => {
   if (paymentMethod === 'credit_card') {
     return {
       payment: {
@@ -80,7 +80,7 @@ export const buildPaymentPayload = (paymentMethod, paymentForm, freightTotal) =>
         card_cvv: onlyDigits(paymentForm.card_cvv),
         installments: Number(paymentForm.installments) || 1,
       },
-      freight_total: freightTotal,
+      shipping_cep: onlyDigits(shippingCep),
     }
   }
 
@@ -88,6 +88,6 @@ export const buildPaymentPayload = (paymentMethod, paymentForm, freightTotal) =>
     payment: {
       method: paymentMethod,
     },
-    freight_total: freightTotal,
+    shipping_cep: onlyDigits(shippingCep),
   }
 }

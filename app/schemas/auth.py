@@ -144,12 +144,29 @@ class UserProfileUpdate(BaseModel):
 
 class UserCreate(UserProfileCreate):
     email: EmailStr
-    password: str = Field(min_length=6)
+    password: str = Field(min_length=10, max_length=72)
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        return value.strip().lower()
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_strength(cls, value: str) -> str:
+        if not re.search(r"[A-Za-z]", value) or not re.search(r"\d", value):
+            raise ValueError("Password must contain letters and numbers")
+        return value
 
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=1, max_length=72)
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalize_email(cls, value: str) -> str:
+        return value.strip().lower()
 
 
 class Token(BaseModel):

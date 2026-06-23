@@ -1,3 +1,4 @@
+import asyncio
 from typing import Any
 
 import cloudinary
@@ -7,7 +8,8 @@ from fastapi import HTTPException, UploadFile, status
 from app.core.config import settings
 
 
-ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+ALLOWED_FOLDERS = {"charme/produtos", "charme/banners", "charme/categorias"}
 MAX_IMAGE_BYTES = 8 * 1024 * 1024
 
 
@@ -35,6 +37,11 @@ class MediaService:
             )
 
         content = await file.read()
+        if not content:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Image file is empty.",
+            )
         if len(content) > MAX_IMAGE_BYTES:
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -42,22 +49,21 @@ class MediaService:
             )
 
         target_folder = folder or settings.CLOUDINARY_DEFAULT_FOLDER
-        if not target_folder.startswith("charme/"):
+        if target_folder not in ALLOWED_FOLDERS:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cloudinary folder must start with charme/.",
+                detail="Invalid Cloudinary folder.",
             )
 
-        result = cloudinary.uploader.upload(
+        result = await asyncio.to_thread(
+            cloudinary.uploader.upload,
             content,
             folder=target_folder,
             resource_type="image",
             overwrite=False,
             use_filename=True,
             unique_filename=True,
-            transformation=[
-                {"quality": "auto", "fetch_format": "auto"},
-            ],
+            transformation=[{"quality": "auto", "fetch_format": "auto"}],
         )
 
         return {

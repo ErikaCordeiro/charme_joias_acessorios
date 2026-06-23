@@ -1,6 +1,7 @@
 from fastapi import APIRouter, FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from app.core.config import settings
 from app.core.logging import logger
 from app.core.monitoring import init_sentry
@@ -41,9 +42,10 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def on_startup() -> None:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-        await conn.run_sync(sync_schema)
+    if settings.AUTO_CREATE_SCHEMA:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(sync_schema)
 
     if settings.SEED_DEFAULT_PRODUCTS:
         try:
@@ -67,19 +69,9 @@ api_v1_router.include_router(admin_router)
 api_v1_router.include_router(media_router)
 app.include_router(api_v1_router)
 
-# Backwards-compatible routes for the current frontend while Vercel is migrated to /api/v1.
-app.include_router(auth_router)
-app.include_router(product_router)
-app.include_router(cart_router)
-app.include_router(shipping_router)
-app.include_router(order_router)
-app.include_router(admin_router)
-app.include_router(media_router)
-
-
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    logger.info(f"Request: {request.method} {request.url}")
+    logger.info(f"Request: {request.method} {request.url.path}")
     response = await call_next(request)
     logger.info(f"Response: {response.status_code}")
     return response
@@ -118,3 +110,10 @@ async def root() -> dict:
 async def health_check() -> dict:
     logger.info("Health check requested")
     return {"status": "ok", "app": settings.APP_NAME}
+
+
+@app.get("/readyz", summary="Database readiness check")
+async def readiness_check() -> dict:
+    async with engine.connect() as connection:
+        await connection.execute(text("SELECT 1"))
+    return {"status": "ready", "database": "connected"}

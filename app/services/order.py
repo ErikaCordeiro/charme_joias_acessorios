@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import selectinload
 from typing import List
 from fastapi import HTTPException, status
@@ -8,6 +8,10 @@ from app.schemas.order import OrderCreate, OrderUpdate
 from app.schemas.payment import PaymentSimulationResponse, PaymentStatus
 from app.services.cart import CartService
 from app.services.payment import PaymentService
+from app.services.shipping import ShippingService
+from app.schemas.shipping import ShippingCalculate
+
+ESTIMATED_ITEM_WEIGHT_KG = 0.35
 
 
 class OrderService:
@@ -24,21 +28,28 @@ class OrderService:
         
         # Get cart items with products
         result = await self.db.execute(
-            select(CartItem, Product).join(Product).where(CartItem.cart_id == cart.id)
+            select(CartItem, Product)
+            .join(Product)
+            .where(CartItem.cart_id == cart.id)
+            .with_for_update()
         )
         cart_items = result.all()
         if not cart_items:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cart is empty")
         
-        if order_data.freight_total < 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Frete invalido para finalizacao do pedido.",
-            )
-
-        # Calculate total
         subtotal = sum(item.quantity * product.price for item, product in cart_items)
-        total = subtotal + order_data.freight_total
+        estimated_weight = sum(
+            item.quantity * ESTIMATED_ITEM_WEIGHT_KG for item, _product in cart_items
+        )
+        shipping_quote = await ShippingService().calculate_shipping(
+            ShippingCalculate(
+                cep=order_data.shipping_cep,
+                weight=estimated_weight,
+                value=subtotal,
+            )
+        )
+        freight_total = shipping_quote.total_freight
+        total = subtotal + freight_total
         
         # Check stock
         for item, product in cart_items:
@@ -61,10 +72,14 @@ class OrderService:
         )
         
         # Create order
-        order = Order(user_id=user_id, total=total, status=order_status)
+        order = Order(
+            user_id=user_id,
+            total=total,
+            freight_total=freight_total,
+            status=order_status,
+        )
         self.db.add(order)
-        await self.db.commit()
-        await self.db.refresh(order)
+        await self.db.flush()
         
         # Create order items and update stock
         for item, product in cart_items:
@@ -77,10 +92,14 @@ class OrderService:
             self.db.add(order_item)
             product.stock -= item.quantity
         
-        # Clear cart
-        await cart_service.clear_cart(user_id)
-        
-        await self.db.commit()
+        await self.db.execute(delete(CartItem).where(CartItem.cart_id == cart.id))
+
+        try:
+            await self.db.commit()
+        except Exception:
+            await self.db.rollback()
+            raise
+        await self.db.refresh(order)
         return order, payment_result
 
     async def get_user_orders(self, user_id: int) -> List[Order]:

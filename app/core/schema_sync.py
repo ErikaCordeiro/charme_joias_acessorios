@@ -15,6 +15,10 @@ USER_COLUMN_DEFINITIONS = {
     "is_admin": "BOOLEAN DEFAULT FALSE",
 }
 
+ORDER_COLUMN_DEFINITIONS = {
+    "freight_total": "DOUBLE PRECISION DEFAULT 0 NOT NULL",
+}
+
 
 def sync_schema(connection) -> None:
     inspector = inspect(connection)
@@ -28,4 +32,17 @@ def sync_schema(connection) -> None:
 
         connection.execute(
             text(f"ALTER TABLE users ADD COLUMN {column_name} {column_type}")
+        )
+
+    if "orders" not in inspector.get_table_names():
+        return
+
+    existing_order_columns = {
+        column["name"] for column in inspector.get_columns("orders")
+    }
+    for column_name, column_type in ORDER_COLUMN_DEFINITIONS.items():
+        if column_name in existing_order_columns:
+            continue
+        connection.execute(
+            text(f"ALTER TABLE orders ADD COLUMN {column_name} {column_type}")
         )

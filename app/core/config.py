@@ -3,7 +3,7 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 from dotenv import dotenv_values
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 env_values = dotenv_values(BASE_DIR / ".env")
@@ -37,8 +37,11 @@ def normalize_database_url(database_url: str | None) -> str:
     filtered_items = []
 
     for key, value in query_items:
-        if key.lower() == "sslmode":
+        normalized_key = key.lower()
+        if normalized_key == "sslmode":
             sslmode_value = value
+            continue
+        if normalized_key == "channel_binding":
             continue
         filtered_items.append((key, value))
 
@@ -46,6 +49,13 @@ def normalize_database_url(database_url: str | None) -> str:
     if sslmode_value and not has_ssl_key:
         ssl_value = "require" if sslmode_value in {"require", "verify-ca", "verify-full"} else sslmode_value
         filtered_items.append(("ssl", ssl_value))
+
+    if parsed.hostname and "-pooler." in parsed.hostname:
+        has_prepared_cache_setting = any(
+            key == "prepared_statement_cache_size" for key, _ in filtered_items
+        )
+        if not has_prepared_cache_setting:
+            filtered_items.append(("prepared_statement_cache_size", "0"))
 
     rebuilt_query = urlencode(filtered_items)
     return urlunparse(parsed._replace(query=rebuilt_query))
@@ -68,20 +78,38 @@ class Settings(BaseModel):
     CLOUDINARY_API_KEY: str = Field("")
     CLOUDINARY_API_SECRET: str = Field("")
     CLOUDINARY_DEFAULT_FOLDER: str = Field("charme/produtos")
+    AUTO_CREATE_SCHEMA: bool = Field(True)
+    DB_POOL_SIZE: int = Field(5)
+    DB_MAX_OVERFLOW: int = Field(5)
+    DB_POOL_TIMEOUT: int = Field(30)
+    DB_POOL_RECYCLE: int = Field(300)
 
-    def is_admin_email(self, email: str) -> bool:
-        if not email:
-            return False
-        normalized = email.strip().lower()
-        admin_emails = [
-            item.strip().lower()
-            for item in self.ADMIN_EMAILS.split(",")
-            if item.strip()
-        ]
-        return normalized in admin_emails
+    @model_validator(mode="after")
+    def validate_production_settings(self):
+        if self.ENVIRONMENT.lower() != "production":
+            return self
+
+        if len(self.SECRET_KEY or "") < 32 or "change-me" in self.SECRET_KEY.lower():
+            raise ValueError("SECRET_KEY must be a strong value with at least 32 characters.")
+        if self.ALGORITHM != "HS256":
+            raise ValueError("ALGORITHM must be HS256.")
+        if not self.DATABASE_URL.startswith("postgresql+asyncpg://"):
+            raise ValueError("DATABASE_URL must be a PostgreSQL connection string.")
+        origins = self.get_cors_origins()
+        if not origins or "*" in origins:
+            raise ValueError("CORS_ORIGINS must list the production frontend origin.")
+        if any("localhost" in origin or "127.0.0.1" in origin for origin in origins):
+            raise ValueError("CORS_ORIGINS cannot include local origins in production.")
+        if not self.ADMIN_EMAILS.strip():
+            raise ValueError("ADMIN_EMAILS must be configured in production.")
+        return self
 
     def get_cors_origins(self) -> list[str]:
-        default_origins = ["http://localhost:5173", "http://127.0.0.1:5173"]
+        default_origins = (
+            []
+            if self.ENVIRONMENT.lower() == "production"
+            else ["http://localhost:5173", "http://127.0.0.1:5173"]
+        )
         if not self.CORS_ORIGINS:
             if self.FRONTEND_URL:
                 return [*default_origins, self.FRONTEND_URL]
@@ -121,4 +149,9 @@ settings = Settings(**{
     "CLOUDINARY_API_KEY": get_setting("CLOUDINARY_API_KEY", ""),
     "CLOUDINARY_API_SECRET": get_setting("CLOUDINARY_API_SECRET", ""),
     "CLOUDINARY_DEFAULT_FOLDER": get_setting("CLOUDINARY_DEFAULT_FOLDER", "charme/produtos"),
+    "AUTO_CREATE_SCHEMA": get_setting("AUTO_CREATE_SCHEMA", "true"),
+    "DB_POOL_SIZE": int(get_setting("DB_POOL_SIZE", 5)),
+    "DB_MAX_OVERFLOW": int(get_setting("DB_MAX_OVERFLOW", 5)),
+    "DB_POOL_TIMEOUT": int(get_setting("DB_POOL_TIMEOUT", 30)),
+    "DB_POOL_RECYCLE": int(get_setting("DB_POOL_RECYCLE", 300)),
 })

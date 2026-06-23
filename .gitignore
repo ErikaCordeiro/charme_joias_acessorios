@@ -107,6 +107,7 @@ celerybeat.pid
 .env
 .env.local
 .venv
+.venv*/
 env/
 venv/
 ENV/
@@ -141,6 +142,8 @@ Thumbs.db
 
 # Logs
 logs/
+*.log
+tmp_*
 
 # Local PostgreSQL data
 .postgres-data/
@@ -149,3 +152,4 @@ lua_active.db
 # Frontend
 frontend/node_modules/
 frontend/build/
+frontend/dist/

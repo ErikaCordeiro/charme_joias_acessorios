@@ -1,7 +1,7 @@
 import random
 import re
 import string
-from uuid import uuid4
+from datetime import datetime, timezone
 
 from fastapi import HTTPException, status
 
@@ -117,6 +117,13 @@ class PaymentService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Validade do cartao invalida. Use MM/AA.",
+            )
+        expiry_month, expiry_year = (int(part) for part in expiry.split("/"))
+        now = datetime.now(timezone.utc)
+        if (2000 + expiry_year, expiry_month) < (now.year, now.month):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cartao expirado.",
             )
 
         cvv = payment_data.card_cvv or ""

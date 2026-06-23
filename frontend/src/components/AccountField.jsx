@@ -8,6 +8,7 @@ function AccountField({
   autoComplete,
   required = true,
   maxLength,
+  minLength,
   disabled = false,
   readOnly = false,
 }) {
@@ -23,6 +24,7 @@ function AccountField({
         autoComplete={autoComplete}
         required={required}
         maxLength={maxLength}
+        minLength={minLength}
         disabled={disabled}
         readOnly={readOnly}
         className="h-12 w-full rounded-full border border-[#0A6772]/15 bg-[#FAFAF8] px-5 text-sm text-[#101827] outline-none transition placeholder:text-[#101827]/35 focus:border-[#0A6772] focus:bg-white focus:ring-4 focus:ring-[#0A6772]/10 disabled:cursor-not-allowed disabled:bg-[#F1EEE8] disabled:text-[#101827]/55"

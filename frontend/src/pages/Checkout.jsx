@@ -217,7 +217,7 @@ function Checkout() {
     setError('')
 
     try {
-      const payload = buildPaymentPayload(paymentMethod, paymentForm, freightTotal)
+      const payload = buildPaymentPayload(paymentMethod, paymentForm, cep)
       const response = await api.post('/orders/', payload)
       const createdOrder = response.data.order
       const paymentResult = response.data.payment
@@ -233,8 +233,8 @@ function Checkout() {
         boletoCode: paymentResult.boleto_code || '',
         maskedCard: paymentResult.masked_card || '',
         settlementDays: paymentResult.estimated_settlement_days,
-        shippingTotal: freightTotal,
-        total,
+        shippingTotal: createdOrder.freight_total,
+        total: createdOrder.total,
       })
 
       setCart((currentCart) => ({

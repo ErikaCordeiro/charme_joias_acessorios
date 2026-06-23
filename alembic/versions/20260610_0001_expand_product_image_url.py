@@ -1,7 +1,7 @@
-"""Expand product image URL length for Cloudinary URLs.
+"""Expand product image URL length for remote media URLs.
 
 Revision ID: 20260610_0001
-Revises:
+Revises: 20260609_0000
 Create Date: 2026-06-10
 """
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = "20260610_0001"
-down_revision = None
+down_revision = "20260609_0000"
 branch_labels = None
 depends_on = None
 

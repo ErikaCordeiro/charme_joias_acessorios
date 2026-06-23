@@ -19,6 +19,7 @@ class OrderResponse(BaseModel):
     id: int
     user_id: int
     total: float
+    freight_total: float
     status: OrderStatus
     created_at: datetime
     items: List[OrderItemResponse]
@@ -29,7 +30,7 @@ class OrderResponse(BaseModel):
 
 class OrderCreate(BaseModel):
     payment: PaymentRequest
-    freight_total: float = Field(default=0, ge=0)
+    shipping_cep: str = Field(min_length=8, max_length=9, pattern=r"^\d{5}-?\d{3}$")
 
 
 class OrderUpdate(BaseModel):

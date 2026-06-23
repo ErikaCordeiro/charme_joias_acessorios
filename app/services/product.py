@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, or_, and_
+from sqlalchemy import func, or_, select
 from typing import Optional, List
 from fastapi import HTTPException, status
 from app.models import Product
@@ -11,7 +11,7 @@ class ProductService:
         self.db = db
 
     async def create_product(self, product_data: ProductCreate) -> Product:
-        product = Product(**product_data.dict())
+        product = Product(**product_data.model_dump())
         self.db.add(product)
         await self.db.commit()
         await self.db.refresh(product)
@@ -42,7 +42,7 @@ class ProductService:
             query = query.where(Product.price >= min_price)
         if max_price is not None:
             query = query.where(Product.price <= max_price)
-        query = query.offset(skip).limit(limit)
+        query = query.order_by(Product.created_at.desc()).offset(skip).limit(limit)
         result = await self.db.execute(query)
         return result.scalars().all()
 
@@ -53,7 +53,7 @@ class ProductService:
         min_price: Optional[float] = None,
         max_price: Optional[float] = None
     ) -> int:
-        query = select(Product)
+        query = select(func.count(Product.id))
         if search:
             query = query.where(or_(Product.name.ilike(f"%{search}%"), Product.description.ilike(f"%{search}%")))
         if category:
@@ -63,11 +63,11 @@ class ProductService:
         if max_price is not None:
             query = query.where(Product.price <= max_price)
         result = await self.db.execute(query)
-        return len(result.scalars().all())  # Note: Inefficient for large datasets, but simple
+        return int(result.scalar_one())
 
     async def update_product(self, product_id: int, product_data: ProductUpdate) -> Product:
         product = await self.get_product(product_id)
-        update_data = product_data.dict(exclude_unset=True)
+        update_data = product_data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(product, key, value)
         await self.db.commit()

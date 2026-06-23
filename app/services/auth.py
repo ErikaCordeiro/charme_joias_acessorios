@@ -2,8 +2,12 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
-from app.core.security import create_access_token, get_password_hash, verify_password
+from app.core.security import (
+    create_access_token,
+    get_password_hash,
+    password_needs_rehash,
+    verify_password,
+)
 from app.models import User
 from app.schemas.auth import UserCreate, UserLogin, UserProfileUpdate
 
@@ -47,7 +51,7 @@ class AuthService:
         user = User(
             email=user_data.email,
             password_hash=get_password_hash(user_data.password),
-            is_admin=settings.is_admin_email(user_data.email),
+            is_admin=False,
             full_name=user_data.full_name,
             phone=user_data.phone,
             cpf=user_data.cpf,
@@ -71,6 +75,9 @@ class AuthService:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
             )
+        if password_needs_rehash(user.password_hash):
+            user.password_hash = get_password_hash(user_data.password)
+            await self.db.commit()
         return user
 
     async def update_user_profile(self, user_id: int, user_data: UserProfileUpdate) -> User:

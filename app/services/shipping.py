@@ -168,7 +168,7 @@ class ShippingService:
         return await asyncio.to_thread(self._fetch_json_sync, url)
 
     def _fetch_json_sync(self, url: str) -> Optional[dict]:
-        request = Request(url=url, headers={"User-Agent": "LuaActive/1.0"})
+        request = Request(url=url, headers={"User-Agent": "CharmeJoias/1.0"})
 
         try:
             with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
