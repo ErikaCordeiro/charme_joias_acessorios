@@ -1,7 +1,15 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
+import SearchModal from '../components/SearchModal'
+import CollectionsSection from '../components/home/CollectionsSection'
+import HomeBenefitsBar from '../components/home/HomeBenefitsBar'
+import HomeHeroSection from '../components/home/HomeHeroSection'
+import HomeHighlightsSection from '../components/home/HomeHighlightsSection'
 
 function Home() {
   const navigate = useNavigate()
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const menuItems = [
     { label: 'JOIAS', to: '/products' },
     { label: 'BRINCOS', to: '/products?category=brincos' },
@@ -31,7 +39,7 @@ function Home() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-3 bg-[#fbfaf7] pl-1 text-[#062f35] sm:gap-4 lg:gap-5">
-            <button type="button" aria-label="Buscar" onClick={() => navigate('/products')} className="transition hover:text-[#0A6772]">
+            <button type="button" aria-label="Buscar" onClick={() => setIsSearchOpen(true)} className="transition hover:text-[#0A6772]">
               <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-[1.6] sm:h-6 sm:w-6">
                 <circle cx="11" cy="11" r="7" />
                 <path d="m16.5 16.5 4 4" />
@@ -58,6 +66,16 @@ function Home() {
         alt="Charme Joias e Acessorios"
         className="block h-auto w-full"
       />
+
+      <HomeHeroSection />
+
+      <HomeHighlightsSection />
+
+      <CollectionsSection />
+
+      <HomeBenefitsBar />
+
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </main>
   )
 }

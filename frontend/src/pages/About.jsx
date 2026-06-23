@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 
+import { INSTAGRAM_URL, WHATSAPP_NUMBER } from '../helpers/contact'
+
 function About() {
   return (
     <section className="mx-auto max-w-6xl space-y-6">
@@ -15,7 +17,7 @@ function About() {
         <article className="rounded-3xl border border-[#0b6f78]/15 bg-white p-6">
           <p className="text-xs uppercase tracking-[0.2em] text-[#0b6f78]">Instagram</p>
           <a
-            href="https://www.instagram.com/charmejoiass/"
+            href={INSTAGRAM_URL}
             target="_blank"
             rel="noreferrer"
             className="mt-3 block text-lg font-semibold text-[#111226] transition hover:text-[#0b6f78]"
@@ -27,7 +29,7 @@ function About() {
         <article className="rounded-3xl border border-[#0b6f78]/15 bg-white p-6">
           <p className="text-xs uppercase tracking-[0.2em] text-[#0b6f78]">WhatsApp</p>
           <a
-            href="https://wa.me/5548988006788"
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noreferrer"
             className="mt-3 block text-lg font-semibold text-[#111226] transition hover:text-[#0b6f78]"

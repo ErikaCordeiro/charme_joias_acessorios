@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import AccountField from '../components/AccountField'
+import { useViaCep } from '../hooks/useViaCep'
 import {
   buildUserProfilePayload,
   emptyUserProfileForm,
@@ -22,6 +23,7 @@ function Profile() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const navigate = useNavigate()
+  const { searchCep: searchViaCep } = useViaCep()
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -61,6 +63,37 @@ function Profile() {
       ...currentForm,
       [name]: value,
     }))
+  }
+
+  const handleFieldChange = (event) => {
+    handleChange(event)
+    // Trigger auto-search for zip code
+    if (event.target.name === 'zip_code' && event.target.value.length === 8) {
+      // Debounce the search
+      const timer = setTimeout(() => {
+        handleZipCodeBlur()
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }
+
+  const handleZipCodeBlur = async () => {
+    const cep = form.zip_code
+    if (!cep || cep.length < 8) {
+      return
+    }
+
+    const addressData = await searchViaCep(cep)
+    if (addressData) {
+      setForm((currentForm) => ({
+        ...currentForm,
+        street: addressData.street,
+        district: addressData.district,
+        city: addressData.city,
+        state: addressData.state,
+      }))
+      setSuccess('Endereço encontrado! Verifique os dados.')
+    }
   }
 
   const handleLogout = () => {
@@ -153,7 +186,8 @@ function Profile() {
                   label={field.label}
                   name={field.name}
                   value={form[field.name]}
-                  onChange={handleChange}
+                  onChange={field.name === 'zip_code' ? handleFieldChange : handleChange}
+                  onBlur={field.name === 'zip_code' ? handleZipCodeBlur : undefined}
                   placeholder={field.placeholder}
                   autoComplete={field.autoComplete}
                   required={field.required ?? true}

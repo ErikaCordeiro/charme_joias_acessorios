@@ -3,6 +3,7 @@ import { formatPrice } from '../../helpers/price'
 function CheckoutShippingCard({
   cep,
   onCepChange,
+  onCepBlur,
   onCalculateShipping,
   loading = false,
   shippingQuote = null,
@@ -25,6 +26,7 @@ function CheckoutShippingCard({
           type="text"
           value={cep}
           onChange={(event) => onCepChange(event.target.value)}
+          onBlur={onCepBlur}
           placeholder="00000-000"
           disabled={disabled || loading}
           className="h-11 flex-1 rounded-full border border-zinc-800 bg-black/70 px-4 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-500 focus:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-60"

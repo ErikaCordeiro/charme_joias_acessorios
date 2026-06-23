@@ -6,6 +6,7 @@ import CheckoutPaymentCard from '../components/checkout/CheckoutPaymentCard'
 import CheckoutShippingCard from '../components/checkout/CheckoutShippingCard'
 import CheckoutSummaryCard from '../components/checkout/CheckoutSummaryCard'
 import FeedbackToast from '../components/FeedbackToast'
+import { useViaCep } from '../hooks/useViaCep'
 import { hydrateCartWithProducts } from '../helpers/cartHydration'
 import {
   buildPaymentPayload,
@@ -38,6 +39,7 @@ const getPaymentStatusTitle = (paymentStatus) => {
 function Checkout() {
   const token = getStoredToken()
   const navigate = useNavigate()
+  const { searchCep: searchViaCep } = useViaCep()
 
   const [cart, setCart] = useState(null)
   const [user, setUser] = useState(null)
@@ -156,6 +158,25 @@ function Checkout() {
       return { ...currentForm, [field]: value }
     })
   }
+
+  const handleCepBlur = useCallback(async () => {
+    const normalizedCep = normalizeCep(cep)
+    if (normalizedCep.length !== 8) {
+      return
+    }
+
+    const addressData = await searchViaCep(normalizedCep)
+    if (addressData) {
+      // CEP address lookup was successful
+      // The address info can be used if needed, but the actual address filling
+      // is done by the backend when the order is placed
+      setFeedback({
+        type: 'success',
+        title: 'CEP validado',
+        message: `CEP válido - ${addressData.city}/${addressData.state}`,
+      })
+    }
+  }, [cep, searchViaCep])
 
   const handleCalculateShipping = async () => {
     if (!cart?.items?.length) {
@@ -402,6 +423,7 @@ function Checkout() {
           <CheckoutShippingCard
             cep={cep}
             onCepChange={(value) => setCep(formatCep(value))}
+            onCepBlur={handleCepBlur}
             onCalculateShipping={handleCalculateShipping}
             loading={shippingLoading}
             shippingQuote={shippingQuote}

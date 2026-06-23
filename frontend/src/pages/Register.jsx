@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import AccountField from '../components/AccountField'
+import { useViaCep } from '../hooks/useViaCep'
 import {
   buildUserProfilePayload,
   emptyUserProfileForm,
@@ -17,6 +18,7 @@ function Register() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const { searchCep: searchViaCep } = useViaCep()
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -24,6 +26,29 @@ function Register() {
       ...currentForm,
       [name]: value,
     }))
+  }
+
+  const handleZipCodeBlur = async () => {
+    const cep = form.zip_code
+    if (!cep || cep.length < 8) {
+      return
+    }
+
+    const addressData = await searchViaCep(cep)
+    if (addressData) {
+      setForm((currentForm) => ({
+        ...currentForm,
+        street: addressData.street,
+        district: addressData.district,
+        city: addressData.city,
+        state: addressData.state,
+      }))
+      setSuccess('Endereço encontrado! Verifique os dados.')
+    }
+  }
+
+  const handleFieldChange = (event) => {
+    handleChange(event)
   }
 
   const handleSubmit = async (event) => {
@@ -96,7 +121,8 @@ function Register() {
               label={field.label}
               name={field.name}
               value={form[field.name]}
-              onChange={handleChange}
+              onChange={handleFieldChange}
+              onBlur={field.name === 'zip_code' ? handleZipCodeBlur : undefined}
               placeholder={field.placeholder}
               autoComplete={field.autoComplete}
               required={field.required ?? true}

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { formatPrice } from '../../helpers/price'
+import { getWhatsAppProductLink } from '../../helpers/contact'
 
 const installmentCount = 6
 
@@ -22,13 +23,21 @@ function HomeHighlightCard({ product }) {
         <p className="text-2xl font-bold text-zinc-100">{formatPrice(product.price)}</p>
         <p className="text-sm text-zinc-400">{installmentCount}x de {formatPrice(installmentValue)}</p>
       </div>
-      <div className="px-4 pb-4">
+      <div className="space-y-2 px-4 pb-4">
         <Link
           to="/products"
           className="inline-flex w-full items-center justify-center rounded-full border border-zinc-700 px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-zinc-200 transition hover:border-zinc-500 hover:text-white"
         >
           Ver produto
         </Link>
+        <a
+          href={getWhatsAppProductLink(product.name, formatPrice(product.price))}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex w-full items-center justify-center rounded-full bg-green-600 px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-green-700"
+        >
+          Tenho Interesse
+        </a>
       </div>
     </article>
   )
