@@ -10,11 +10,11 @@ function FeedbackToast({
 
   const isSuccess = type === 'success'
   const containerClasses = isSuccess
-    ? 'border-zinc-300/35 bg-zinc-900/95 text-zinc-100'
-    : 'border-red-500/30 bg-red-950/90 text-red-100'
-  const titleClasses = isSuccess ? 'text-zinc-300' : 'text-red-300'
+    ? 'border-[#d8a84f]/45 bg-white text-[#062f35]'
+    : 'border-red-500/30 bg-red-50 text-red-800'
+  const titleClasses = isSuccess ? 'text-[#0b6f78]' : 'text-red-700'
   const buttonClasses = isSuccess
-    ? 'border-zinc-400/60 bg-zinc-300 text-zinc-900 hover:bg-zinc-200'
+    ? 'border-[#d8a84f]/60 bg-[#d8a84f] text-[#062f35] hover:bg-[#efc66b]'
     : 'border-red-300/50 bg-red-300 text-red-900 hover:bg-red-200'
 
   return (

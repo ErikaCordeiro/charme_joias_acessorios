@@ -1,25 +1,23 @@
 #!/bin/bash
 
-# Script para executar o projeto Lua Active
+set -euo pipefail
 
-echo "🚀 Iniciando Lua Active..."
+echo "Iniciando Charme Joias e Acessorios..."
 
-# Verifica se Docker está instalado
 if ! command -v docker &> /dev/null; then
-    echo "❌ Docker não está instalado. Instale o Docker primeiro."
+    echo "Docker nao esta instalado."
     exit 1
 fi
 
-# Verifica se Docker Compose está instalado
 if ! command -v docker-compose &> /dev/null; then
-    echo "❌ Docker Compose não está instalado. Instale o Docker Compose primeiro."
+    echo "Docker Compose nao esta instalado."
     exit 1
 fi
 
-echo "🐳 Construindo e iniciando containers..."
+echo "Construindo e iniciando containers..."
 docker-compose up --build
 
-echo "✅ Projeto iniciado!"
-echo "📱 Frontend: http://localhost:3000"
-echo "🔧 Backend API: http://localhost:8000"
-echo "📊 Documentação API: http://localhost:8000/docs"
+echo "Projeto iniciado."
+echo "Frontend: http://localhost:5173"
+echo "Backend API: http://localhost:8000"
+echo "Documentacao API: http://localhost:8000/docs"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import CheckoutItemRow from '../components/checkout/CheckoutItemRow'
@@ -173,7 +173,7 @@ function Checkout() {
       setFeedback({
         type: 'success',
         title: 'CEP validado',
-        message: `CEP válido - ${addressData.city}/${addressData.state}`,
+        message: `CEP vÃ¡lido - ${addressData.city}/${addressData.state}`,
       })
     }
   }, [cep, searchViaCep])
@@ -297,13 +297,13 @@ function Checkout() {
 
   if (!token) {
     return (
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-200 shadow-soft">
-        <h1 className="text-2xl font-semibold text-white">Entre na sua conta para finalizar o pedido</h1>
-        <p className="mt-3 text-zinc-400">O checkout precisa da autenticacao para concluir pagamento e entrega.</p>
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-8 text-center text-[#111226]/75 shadow-soft">
+        <h1 className="text-2xl font-semibold text-[#062f35]">Entre na sua conta para finalizar o pedido</h1>
+        <p className="mt-3 text-[#111226]/60">O checkout precisa da autenticacao para concluir pagamento e entrega.</p>
         <button
           type="button"
           onClick={() => navigate('/login')}
-          className="mt-6 rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+          className="mt-6 rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b]"
         >
           Entrar
         </button>
@@ -313,7 +313,7 @@ function Checkout() {
 
   if (loading) {
     return (
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-300 shadow-soft">
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-8 text-center text-[#111226]/70 shadow-soft">
         Carregando checkout...
       </div>
     )
@@ -321,42 +321,42 @@ function Checkout() {
 
   if (orderSuccess) {
     return (
-      <section className="mx-auto max-w-3xl rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 shadow-soft">
-        <h1 className="text-3xl font-semibold text-white">Pedido confirmado</h1>
-        <p className="mt-3 text-zinc-300">
-          Pedido <span className="font-semibold text-white">#{orderSuccess.orderId}</span> gerado com sucesso.
+      <section className="mx-auto max-w-3xl rounded-3xl border border-[#0b6f78]/12 bg-white p-8 shadow-soft">
+        <h1 className="text-3xl font-semibold text-[#062f35]">Pedido confirmado</h1>
+        <p className="mt-3 text-[#111226]/70">
+          Pedido <span className="font-semibold text-[#062f35]">#{orderSuccess.orderId}</span> gerado com sucesso.
         </p>
-        <div className="mt-6 grid gap-3 rounded-2xl border border-zinc-800 bg-black/70 p-5 text-sm text-zinc-300 sm:grid-cols-2">
-          <p>Pagamento: <span className="font-semibold text-zinc-100">{orderSuccess.paymentMethodTitle}</span></p>
-          <p>Status: <span className="font-semibold text-zinc-100">{orderSuccess.paymentStatusTitle}</span></p>
-          <p>Banco: <span className="font-semibold text-zinc-100">{orderSuccess.paymentProvider}</span></p>
-          <p>Transacao: <span className="font-semibold text-zinc-100">{orderSuccess.transactionId}</span></p>
+        <div className="mt-6 grid gap-3 rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1] p-5 text-sm text-[#111226]/70 sm:grid-cols-2">
+          <p>Pagamento: <span className="font-semibold text-[#062f35]">{orderSuccess.paymentMethodTitle}</span></p>
+          <p>Status: <span className="font-semibold text-[#062f35]">{orderSuccess.paymentStatusTitle}</span></p>
+          <p>Banco: <span className="font-semibold text-[#062f35]">{orderSuccess.paymentProvider}</span></p>
+          <p>Transacao: <span className="font-semibold text-[#062f35]">{orderSuccess.transactionId}</span></p>
           {orderSuccess.maskedCard && (
-            <p>Cartao: <span className="font-semibold text-zinc-100">{orderSuccess.maskedCard}</span></p>
+            <p>Cartao: <span className="font-semibold text-[#062f35]">{orderSuccess.maskedCard}</span></p>
           )}
           {orderSuccess.settlementDays > 0 && (
-            <p>Compensacao: <span className="font-semibold text-zinc-100">ate {orderSuccess.settlementDays} dias uteis</span></p>
+            <p>Compensacao: <span className="font-semibold text-[#062f35]">ate {orderSuccess.settlementDays} dias uteis</span></p>
           )}
-          <p>Frete: <span className="font-semibold text-zinc-100">{formatPrice(orderSuccess.shippingTotal)}</span></p>
-          <p className="sm:col-span-2">Total pago: <span className="font-semibold text-zinc-100">{formatPrice(orderSuccess.total)}</span></p>
-          <p className="sm:col-span-2 text-zinc-400">{orderSuccess.paymentMessage}</p>
+          <p>Frete: <span className="font-semibold text-[#062f35]">{formatPrice(orderSuccess.shippingTotal)}</span></p>
+          <p className="sm:col-span-2">Total pago: <span className="font-semibold text-[#062f35]">{formatPrice(orderSuccess.total)}</span></p>
+          <p className="sm:col-span-2 text-[#111226]/60">{orderSuccess.paymentMessage}</p>
           {orderSuccess.pixCode && (
-            <p className="sm:col-span-2 break-all text-zinc-300">PIX copia e cola: {orderSuccess.pixCode}</p>
+            <p className="sm:col-span-2 break-all text-[#111226]/70">PIX copia e cola: {orderSuccess.pixCode}</p>
           )}
           {orderSuccess.boletoCode && (
-            <p className="sm:col-span-2 break-all text-zinc-300">Codigo do boleto: {orderSuccess.boletoCode}</p>
+            <p className="sm:col-span-2 break-all text-[#111226]/70">Codigo do boleto: {orderSuccess.boletoCode}</p>
           )}
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             to="/profile"
-            className="rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+            className="rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b]"
           >
             Ver meus pedidos
           </Link>
           <Link
             to="/products"
-            className="rounded-full border border-zinc-700 bg-zinc-900 px-6 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500 hover:text-white"
+            className="rounded-full border border-[#0b6f78]/20 bg-white px-6 py-3 text-sm font-semibold text-[#111226]/75 transition hover:border-[#d8a84f] hover:text-[#062f35]"
           >
             Continuar comprando
           </Link>
@@ -367,13 +367,13 @@ function Checkout() {
 
   if (hasEmptyCart) {
     return (
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-200 shadow-soft">
-        <h1 className="text-2xl font-semibold text-white">Seu carrinho esta vazio</h1>
-        <p className="mt-3 text-zinc-400">Adicione produtos antes de iniciar o checkout.</p>
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-8 text-center text-[#111226]/75 shadow-soft">
+        <h1 className="text-2xl font-semibold text-[#062f35]">Seu carrinho esta vazio</h1>
+        <p className="mt-3 text-[#111226]/60">Adicione produtos antes de iniciar o checkout.</p>
         <button
           type="button"
           onClick={() => navigate('/products')}
-          className="mt-6 rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+          className="mt-6 rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b]"
         >
           Ver produtos
         </button>
@@ -383,9 +383,9 @@ function Checkout() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6 shadow-soft">
-        <h1 className="text-3xl font-semibold text-white">Finalizar pedido</h1>
-        <p className="mt-2 text-zinc-400">Revise itens, calcule frete por CEP e escolha o pagamento.</p>
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-6 shadow-soft">
+        <h1 className="text-3xl font-semibold text-[#062f35]">Finalizar pedido</h1>
+        <p className="mt-2 text-[#111226]/60">Revise itens, calcule frete por CEP e escolha o pagamento.</p>
       </div>
 
       {error && (
@@ -396,8 +396,8 @@ function Checkout() {
 
       <div className="grid gap-6 xl:grid-cols-[1.3fr_0.7fr]">
         <div className="space-y-6">
-          <section className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6 shadow-soft">
-            <h2 className="text-xl font-semibold text-white">Itens do pedido</h2>
+          <section className="rounded-3xl border border-[#0b6f78]/12 bg-white p-6 shadow-soft">
+            <h2 className="text-xl font-semibold text-[#062f35]">Itens do pedido</h2>
             <div className="mt-5 space-y-3">
               {cart.items.map((item) => (
                 <CheckoutItemRow key={item.id} item={item} />
@@ -405,15 +405,15 @@ function Checkout() {
             </div>
           </section>
 
-          <section className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6 shadow-soft">
-            <h2 className="text-xl font-semibold text-white">Endereco de entrega</h2>
-            <p className="mt-3 text-sm text-zinc-300">
+          <section className="rounded-3xl border border-[#0b6f78]/12 bg-white p-6 shadow-soft">
+            <h2 className="text-xl font-semibold text-[#062f35]">Endereco de entrega</h2>
+            <p className="mt-3 text-sm text-[#111226]/70">
               {formatFullAddress(user) || 'Complete seu endereco em Minha Conta para facilitar as proximas compras.'}
             </p>
             {!formatFullAddress(user) && (
               <Link
                 to="/profile"
-                className="mt-4 inline-flex rounded-full border border-zinc-700 bg-zinc-900 px-5 py-2 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500 hover:text-white"
+                className="mt-4 inline-flex rounded-full border border-[#0b6f78]/20 bg-white px-5 py-2 text-sm font-semibold text-[#111226]/75 transition hover:border-[#d8a84f] hover:text-[#062f35]"
               >
                 Atualizar endereco
               </Link>

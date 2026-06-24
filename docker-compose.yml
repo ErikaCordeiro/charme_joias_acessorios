@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: lua_active
+      POSTGRES_DB: charme_joias
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
@@ -13,7 +13,7 @@ services:
   backend:
     build: .
     environment:
-      DATABASE_URL: postgresql+asyncpg://user:password@db:5432/lua_active
+      DATABASE_URL: postgresql+asyncpg://user:password@db:5432/charme_joias
       SECRET_KEY: local-docker-secret-key-change-before-production
       ENVIRONMENT: development
       ADMIN_EMAILS: cjoiaseacessorios@gmail.com

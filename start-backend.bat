@@ -1,46 +1,34 @@
 @echo off
-echo 🚀 Iniciando Backend Lua Active...
+echo Iniciando Backend Charme Joias e Acessorios...
 echo.
 
-REM Verificar se Python está instalado
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Python não encontrado!
-    echo 📥 Instale Python de: https://www.python.org/downloads/
+    echo Python nao encontrado.
+    echo Instale Python em: https://www.python.org/downloads/
     pause
     exit /b 1
 )
 
-echo ✅ Python encontrado!
-
-REM Criar ambiente virtual se não existir
 if not exist venv (
-    echo 🐍 Criando ambiente virtual...
+    echo Criando ambiente virtual...
     python -m venv venv
 )
 
-REM Ativar ambiente virtual
-echo 🔧 Ativando ambiente virtual...
+echo Ativando ambiente virtual...
 call venv\Scripts\activate.bat
 
-REM Instalar dependências Python
-echo 📦 Instalando dependências...
+echo Instalando dependencias...
 pip install -r requirements.txt
 
-REM Executar migrações do banco
-echo 🗄️ Executando migrações...
+echo Executando migrations...
 alembic upgrade head
 
-REM Executar seed de dados
-echo 🌱 Populando banco de dados...
+echo Sincronizando produtos Charme...
 python scripts/seed.py
 
-echo ✅ Setup completo!
-echo 🚀 Iniciando servidor...
-echo.
-echo 📱 API disponível em: http://localhost:8000
-echo 📚 Documentação em: http://localhost:8000/docs
+echo Backend disponivel em: http://localhost:8000
+echo Documentacao em: http://localhost:8000/docs
 echo.
 
-REM Iniciar servidor
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

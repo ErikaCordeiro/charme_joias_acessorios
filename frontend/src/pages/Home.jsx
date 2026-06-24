@@ -7,6 +7,37 @@ import HomeBenefitsBar from '../components/home/HomeBenefitsBar'
 import HomeHeroSection from '../components/home/HomeHeroSection'
 import HomeHighlightsSection from '../components/home/HomeHighlightsSection'
 
+const featuredProducts = [
+  {
+    id: 'home-colar-ponto-luz',
+    name: 'Colar Ponto de Luz',
+    price: 149.9,
+    category: 'Colares',
+    image_url: '/products/charme/conjunto-prata-ponto-luz.jpeg',
+  },
+  {
+    id: 'home-brinco-organico',
+    name: 'Brincos Organicos Dourados',
+    price: 129.9,
+    category: 'Brincos',
+    image_url: '/products/charme/brincos-organicos-dourados.jpeg',
+  },
+  {
+    id: 'home-anel-organico',
+    name: 'Anel Organico Dourado',
+    price: 119.9,
+    category: 'Aneis',
+    image_url: '/products/charme/conjunto-dourado-caixa.jpeg',
+  },
+  {
+    id: 'home-pulseira-laminada',
+    name: 'Pulseira Laminada Dourada',
+    price: 139.9,
+    category: 'Pulseiras',
+    image_url: '/products/charme/corrente-laminada-dourada.jpeg',
+  },
+]
+
 function Home() {
   const navigate = useNavigate()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -22,7 +53,7 @@ function Home() {
   ]
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white">
+    <main className="min-h-screen overflow-x-hidden bg-[#fbf8f1]">
       <header className="sticky top-0 z-50 border-b border-[#062f35]/10 bg-[#fbfaf7]/98 backdrop-blur">
         <div className="mx-auto grid min-h-[56px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:min-h-[62px] sm:gap-5 sm:px-5 lg:px-8">
           <nav className="hide-scrollbar flex min-w-0 items-center gap-5 overflow-x-auto whitespace-nowrap pr-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#062f35] sm:gap-7 sm:text-[11px] md:justify-center lg:gap-9 xl:gap-11">
@@ -61,19 +92,13 @@ function Home() {
         </div>
       </header>
 
-      <img
-        src="/mockup/charme-home-no-header.png"
-        alt="Charme Joias e Acessorios"
-        className="block h-auto w-full"
-      />
-
       <HomeHeroSection />
 
-      <HomeHighlightsSection />
+      <HomeBenefitsBar />
 
       <CollectionsSection />
 
-      <HomeBenefitsBar />
+      <HomeHighlightsSection products={featuredProducts} />
 
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </main>

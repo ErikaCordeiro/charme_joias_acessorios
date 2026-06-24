@@ -1,42 +1,31 @@
 import { Link } from 'react-router-dom'
 
-import { formatPrice } from '../../helpers/price'
 import { getWhatsAppProductLink } from '../../helpers/contact'
-
-const installmentCount = 6
+import { formatPrice } from '../../helpers/price'
 
 function HomeHighlightCard({ product }) {
-  const installmentValue = product.price / installmentCount
-
   return (
-    <article className="overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950/80 transition hover:-translate-y-1 hover:border-zinc-700">
-      <div className="relative h-64 overflow-hidden bg-black/80">
+    <article className="group border border-[#0b6f78]/12 bg-white transition hover:-translate-y-1 hover:border-[#d8a84f]/60 hover:shadow-[0_22px_60px_rgba(6,47,53,0.10)]">
+      <Link to="/products" className="block overflow-hidden bg-[#f7f1e8]">
         <img
-          src={product.image_url || '/hero/home-reference.png'}
+          src={product.image_url || '/products/charme/conjunto-dourado-caixa.jpeg'}
           alt={product.name}
-          className="h-full w-full object-cover"
+          className="h-64 w-full object-cover transition duration-500 group-hover:scale-[1.03]"
         />
-      </div>
-      <div className="space-y-2 p-4">
-        <p className="text-xs uppercase tracking-[0.08em] text-zinc-500">{product.category || 'Coleção Charme'}</p>
-        <h3 className="text-lg font-semibold text-zinc-100">{product.name}</h3>
-        <p className="text-2xl font-bold text-zinc-100">{formatPrice(product.price)}</p>
-        <p className="text-sm text-zinc-400">{installmentCount}x de {formatPrice(installmentValue)}</p>
-      </div>
-      <div className="space-y-2 px-4 pb-4">
-        <Link
-          to="/products"
-          className="inline-flex w-full items-center justify-center rounded-full border border-zinc-700 px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-zinc-200 transition hover:border-zinc-500 hover:text-white"
-        >
-          Ver produto
-        </Link>
+      </Link>
+      <div className="space-y-3 p-4 text-center">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-[0.24em] text-[#0b6f78]/70">
+          {product.category || 'Colecao Charme'}
+        </p>
+        <h3 className="min-h-12 text-sm font-medium leading-6 text-[#111226]">{product.name}</h3>
+        <p className="text-base font-bold text-[#062f35]">{formatPrice(product.price)}</p>
         <a
           href={getWhatsAppProductLink(product.name, formatPrice(product.price))}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex w-full items-center justify-center rounded-full bg-green-600 px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-green-700"
+          className="inline-flex w-full items-center justify-center border border-[#d8a84f] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#062f35] transition hover:bg-[#d8a84f] hover:text-white"
         >
-          Tenho Interesse
+          Tenho interesse
         </a>
       </div>
     </article>

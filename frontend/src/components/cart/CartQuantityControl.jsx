@@ -1,4 +1,4 @@
-function CartQuantityControl({
+﻿function CartQuantityControl({
   quantity,
   min = 1,
   max,
@@ -50,12 +50,12 @@ function CartQuantityControl({
   }
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-black/70 p-1">
+    <div className="inline-flex items-center gap-2 rounded-full border border-[#0b6f78]/12 bg-[#fbf8f1] p-1">
       <button
         type="button"
         onClick={handleDecrease}
         disabled={disabled || quantity <= min}
-        className="h-8 w-8 rounded-full border border-zinc-700 bg-zinc-900 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="h-8 w-8 rounded-full border border-[#0b6f78]/20 bg-white text-sm font-semibold text-[#111226]/75 transition hover:border-[#d8a84f] hover:text-[#062f35] disabled:cursor-not-allowed disabled:opacity-50"
       >
         -
       </button>
@@ -72,13 +72,13 @@ function CartQuantityControl({
           }
         }}
         disabled={disabled}
-        className="h-8 w-16 rounded-full border border-zinc-700 bg-zinc-950 px-3 text-center text-sm font-semibold text-white outline-none transition focus:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="h-8 w-16 rounded-full border border-[#0b6f78]/20 bg-white px-3 text-center text-sm font-semibold text-[#062f35] outline-none transition focus:border-[#0b6f78] disabled:cursor-not-allowed disabled:opacity-60"
       />
       <button
         type="button"
         onClick={handleIncrease}
         disabled={disabled || (typeof max === 'number' && quantity >= max)}
-        className="h-8 w-8 rounded-full border border-zinc-700 bg-zinc-900 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        className="h-8 w-8 rounded-full border border-[#0b6f78]/20 bg-white text-sm font-semibold text-[#111226]/75 transition hover:border-[#d8a84f] hover:text-[#062f35] disabled:cursor-not-allowed disabled:opacity-50"
       >
         +
       </button>

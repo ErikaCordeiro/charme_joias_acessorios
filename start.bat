@@ -1,56 +1,44 @@
 @echo off
-echo 🚀 Iniciando Lua Active...
+echo Iniciando Charme Joias e Acessorios...
 echo.
 
-REM Verificar se Python está instalado
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Python não encontrado!
-    echo 📥 Instale Python de: https://www.python.org/downloads/
-    echo Ou via Microsoft Store: "Python 3.11"
+    echo Python nao encontrado.
+    echo Instale Python em: https://www.python.org/downloads/
     pause
     exit /b 1
 )
 
-REM Verificar se Node.js está instalado
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Node.js não encontrado!
-    echo 📥 Instale Node.js de: https://nodejs.org/
+    echo Node.js nao encontrado.
+    echo Instale Node.js em: https://nodejs.org/
     pause
     exit /b 1
 )
 
-echo ✅ Dependências encontradas!
+echo Dependencias base encontradas.
 
-REM Criar ambiente virtual se não existir
 if not exist venv (
-    echo 🐍 Criando ambiente virtual...
+    echo Criando ambiente virtual...
     python -m venv venv
 )
 
-REM Ativar ambiente virtual
-echo 🔧 Ativando ambiente virtual...
+echo Ativando ambiente virtual...
 call venv\Scripts\activate.bat
 
-REM Instalar dependências Python
-echo 📦 Instalando dependências Python...
+echo Instalando dependencias Python...
 pip install -r requirements.txt
 
-REM Executar migrações do banco
-echo 🗄️ Executando migrações...
+echo Executando migrations...
 alembic upgrade head
 
-REM Executar seed de dados
-echo 🌱 Populando banco de dados...
+echo Sincronizando produtos Charme...
 python scripts/seed.py
 
-echo ✅ Backend pronto!
+echo Iniciando frontend...
+start cmd /k "cd frontend && npm install && npm run dev -- --host 0.0.0.0"
 
-REM Abrir novo terminal para o frontend
-echo 🎨 Iniciando frontend...
-start cmd /k "cd frontend && npm install && npm start"
-
-REM Iniciar backend
-echo 🚀 Iniciando backend...
+echo Iniciando backend...
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

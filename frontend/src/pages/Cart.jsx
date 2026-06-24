@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+﻿import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import FeedbackToast from '../components/FeedbackToast'
@@ -149,13 +149,13 @@ function Cart() {
 
   if (!token) {
     return (
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-200 shadow-soft">
-        <h1 className="text-2xl font-semibold text-white">Faca login para ver o carrinho</h1>
-        <p className="mt-3 text-zinc-400">Acesse sua conta para gerenciar itens e finalizar pedidos.</p>
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-8 text-center text-[#111226]/75 shadow-soft">
+        <h1 className="text-2xl font-semibold text-[#062f35]">Faca login para ver o carrinho</h1>
+        <p className="mt-3 text-[#111226]/60">Acesse sua conta para gerenciar itens e finalizar pedidos.</p>
         <button
           type="button"
           onClick={() => navigate('/login')}
-          className="mt-6 rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+          className="mt-6 rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b]"
         >
           Entrar na conta
         </button>
@@ -164,18 +164,18 @@ function Cart() {
   }
 
   if (loading) {
-    return <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-300 shadow-soft">Carregando carrinho...</div>
+    return <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-8 text-center text-[#111226]/70 shadow-soft">Carregando carrinho...</div>
   }
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 text-center text-zinc-200 shadow-soft">
-        <h1 className="text-2xl font-semibold text-white">Seu carrinho esta vazio</h1>
-        <p className="mt-3 text-zinc-400">Adicione produtos na loja e eles aparecerao aqui.</p>
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-8 text-center text-[#111226]/75 shadow-soft">
+        <h1 className="text-2xl font-semibold text-[#062f35]">Seu carrinho esta vazio</h1>
+        <p className="mt-3 text-[#111226]/60">Adicione produtos na loja e eles aparecerao aqui.</p>
         <button
           type="button"
           onClick={() => navigate('/products')}
-          className="mt-6 rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+          className="mt-6 rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b]"
         >
           Ver Produtos
         </button>
@@ -185,15 +185,15 @@ function Cart() {
 
   return (
     <section className="space-y-8">
-      <div className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6 shadow-soft">
+      <div className="rounded-3xl border border-[#0b6f78]/12 bg-white p-6 shadow-soft">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-semibold text-white">Carrinho</h1>
-            <p className="mt-2 text-zinc-400">Edite quantidades, revise os itens e finalize seu pedido.</p>
+            <h1 className="text-3xl font-semibold text-[#062f35]">Carrinho</h1>
+            <p className="mt-2 text-[#111226]/60">Edite quantidades, revise os itens e finalize seu pedido.</p>
           </div>
           <div className="text-right">
-            <p className="text-sm uppercase tracking-[0.24em] text-zinc-500">Total</p>
-            <p className="mt-1 text-2xl font-semibold text-white">{formatPrice(cart.subtotal)}</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-[#0b6f78]/60">Total</p>
+            <p className="mt-1 text-2xl font-semibold text-[#062f35]">{formatPrice(cart.subtotal)}</p>
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ function Cart() {
       <button
         type="button"
         onClick={() => navigate('/checkout')}
-        className="rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200"
+        className="rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b]"
       >
         Finalizar Pedido
       </button>

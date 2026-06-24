@@ -1,4 +1,4 @@
-import CartQuantityControl from './CartQuantityControl'
+﻿import CartQuantityControl from './CartQuantityControl'
 import { formatPrice } from '../../helpers/price'
 
 const placeholderImage = (title) => {
@@ -20,10 +20,10 @@ function CartItemCard({
   const imageUrl = item.product?.image_url || placeholderImage(itemTitle)
 
   return (
-    <article className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-5 shadow-soft">
+    <article className="rounded-3xl border border-[#0b6f78]/12 bg-white p-5 shadow-soft">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-4">
-          <div className="h-24 w-24 overflow-hidden rounded-2xl border border-zinc-800 bg-black/80">
+          <div className="h-24 w-24 overflow-hidden rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1]">
             <img
               src={imageUrl}
               alt={itemTitle}
@@ -36,11 +36,11 @@ function CartItemCard({
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">{itemCategory}</p>
-            <h2 className="text-lg font-semibold text-white">{itemTitle}</h2>
-            <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-400">
+            <p className="text-xs uppercase tracking-[0.22em] text-[#0b6f78]/60">{itemCategory}</p>
+            <h2 className="text-lg font-semibold text-[#062f35]">{itemTitle}</h2>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-[#111226]/60">
               <span>Unitario: {formatPrice(item.unit_price)}</span>
-              <span className="rounded-full bg-zinc-900 px-3 py-1 text-zinc-300">
+              <span className="rounded-full bg-[#fbf8f1] px-3 py-1 text-[#111226]/70">
                 Estoque {item.product?.stock ?? 0}
               </span>
             </div>
@@ -55,15 +55,15 @@ function CartItemCard({
             disabled={pending}
             onCommit={onQuantityChange}
           />
-          <div className="rounded-2xl border border-zinc-800 bg-black/70 px-4 py-3 text-right">
-            <p className="text-xs uppercase tracking-[0.2em] text-zinc-500">Subtotal</p>
-            <p className="mt-1 text-lg font-semibold text-white">{formatPrice(item.line_total)}</p>
+          <div className="rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 py-3 text-right">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#0b6f78]/60">Subtotal</p>
+            <p className="mt-1 text-lg font-semibold text-[#062f35]">{formatPrice(item.line_total)}</p>
           </div>
           <button
             type="button"
             onClick={onRemove}
             disabled={pending}
-            className="rounded-full border border-zinc-700 bg-zinc-900 px-5 py-2 text-sm font-semibold text-zinc-200 transition hover:border-red-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-full border border-[#0b6f78]/20 bg-white px-5 py-2 text-sm font-semibold text-[#111226]/75 transition hover:border-red-400 hover:text-[#062f35] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {pending ? 'Atualizando...' : 'Remover'}
           </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import AccountField from '../components/AccountField'
@@ -43,7 +43,7 @@ function Register() {
         city: addressData.city,
         state: addressData.state,
       }))
-      setSuccess('Endereço encontrado! Verifique os dados.')
+      setSuccess('EndereÃ§o encontrado! Verifique os dados.')
     }
   }
 
@@ -83,9 +83,9 @@ function Register() {
   }
 
   return (
-    <section className="mx-auto max-w-4xl rounded-3xl border border-zinc-900 bg-zinc-950/70 p-8 shadow-soft">
-      <h1 className="text-3xl font-semibold text-white">Criar conta</h1>
-      <p className="mt-2 text-zinc-400">Preencha seus dados para comprar e acompanhar pedidos na Charme Joias.</p>
+    <section className="mx-auto max-w-4xl rounded-3xl border border-[#0b6f78]/12 bg-white p-8 shadow-soft">
+      <h1 className="text-3xl font-semibold text-[#062f35]">Criar conta</h1>
+      <p className="mt-2 text-[#111226]/60">Preencha seus dados para comprar e acompanhar pedidos na Charme Joias.</p>
 
       {success && <div className="mt-6 rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-200">{success}</div>}
       {error && <div className="mt-6 rounded-3xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</div>}
@@ -134,7 +134,7 @@ function Register() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-full bg-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-full bg-[#d8a84f] px-6 py-3 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? 'Criando conta...' : 'Criar conta'}
         </button>

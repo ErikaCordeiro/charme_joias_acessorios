@@ -1,4 +1,4 @@
-import { formatPrice } from '../../helpers/price'
+﻿import { formatPrice } from '../../helpers/price'
 
 function CheckoutShippingCard({
   cep,
@@ -11,9 +11,9 @@ function CheckoutShippingCard({
   disabled = false,
 }) {
   return (
-    <section className="rounded-3xl border border-zinc-900 bg-zinc-950/70 p-6 shadow-soft">
-      <h2 className="text-xl font-semibold text-white">Frete por CEP</h2>
-      <p className="mt-2 text-sm text-zinc-400">Informe o CEP para calcular entrega e prazo estimado por regiao.</p>
+    <section className="rounded-3xl border border-[#0b6f78]/12 bg-white p-6 shadow-soft">
+      <h2 className="text-xl font-semibold text-[#062f35]">Frete por CEP</h2>
+      <p className="mt-2 text-sm text-[#111226]/60">Informe o CEP para calcular entrega e prazo estimado por regiao.</p>
 
       <form
         onSubmit={(event) => {
@@ -29,12 +29,12 @@ function CheckoutShippingCard({
           onBlur={onCepBlur}
           placeholder="00000-000"
           disabled={disabled || loading}
-          className="h-11 flex-1 rounded-full border border-zinc-800 bg-black/70 px-4 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-500 focus:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-11 flex-1 rounded-full border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 text-sm text-[#062f35] outline-none transition placeholder:text-[#0b6f78]/60 focus:border-[#d8a84f] disabled:cursor-not-allowed disabled:opacity-60"
         />
         <button
           type="submit"
           disabled={disabled || loading}
-          className="h-11 rounded-full bg-zinc-300 px-6 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-11 rounded-full bg-[#d8a84f] px-6 text-sm font-semibold text-[#062f35] transition hover:bg-[#efc66b] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? 'Calculando...' : 'Calcular frete'}
         </button>
@@ -47,30 +47,30 @@ function CheckoutShippingCard({
       )}
 
       {shippingQuote && (
-        <div className="mt-5 grid gap-3 rounded-2xl border border-zinc-800 bg-black/70 p-4 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1] p-4 sm:grid-cols-2">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Destino</p>
-            <p className="mt-1 text-sm text-zinc-200">{shippingQuote.cep} - {shippingQuote.uf}</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#0b6f78]/60">Destino</p>
+            <p className="mt-1 text-sm text-[#111226]/75">{shippingQuote.cep} - {shippingQuote.uf}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Regiao</p>
-            <p className="mt-1 text-sm text-zinc-200">{shippingQuote.region}</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#0b6f78]/60">Regiao</p>
+            <p className="mt-1 text-sm text-[#111226]/75">{shippingQuote.region}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Transportadora</p>
-            <p className="mt-1 text-sm text-zinc-200">{shippingQuote.carrier}</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#0b6f78]/60">Transportadora</p>
+            <p className="mt-1 text-sm text-[#111226]/75">{shippingQuote.carrier}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Prazo</p>
-            <p className="mt-1 text-sm text-zinc-200">Ate {shippingQuote.estimated_days} dias uteis</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#0b6f78]/60">Prazo</p>
+            <p className="mt-1 text-sm text-[#111226]/75">Ate {shippingQuote.estimated_days} dias uteis</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Base do frete</p>
-            <p className="mt-1 text-sm text-zinc-200">{formatPrice(shippingQuote.base_freight)}</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#0b6f78]/60">Base do frete</p>
+            <p className="mt-1 text-sm text-[#111226]/75">{formatPrice(shippingQuote.base_freight)}</p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">Frete total</p>
-            <p className="mt-1 text-lg font-semibold text-zinc-100">{formatPrice(shippingQuote.total_freight)}</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-[#0b6f78]/60">Frete total</p>
+            <p className="mt-1 text-lg font-semibold text-[#062f35]">{formatPrice(shippingQuote.total_freight)}</p>
           </div>
         </div>
       )}

@@ -32,25 +32,9 @@ const allowedCategories = new Set([
   'sale',
 ])
 
-const blockedTerms = [
-  'camiseta',
-  'camisa',
-  'regata',
-  'short',
-  'calca',
-  'legging',
-  'moletom',
-  'top',
-]
-
 const isCharmeProduct = (product) => {
   const category = product.category?.toLowerCase() || ''
   const imageUrl = product.image_url?.toLowerCase() || ''
-  const searchableText = `${product.name || ''} ${product.description || ''}`.toLowerCase()
-
-  if (blockedTerms.some((term) => searchableText.includes(term) || imageUrl.includes(term))) {
-    return false
-  }
 
   return allowedCategories.has(category) || imageUrl.includes('/products/charme/')
 }
@@ -227,10 +211,10 @@ function Products() {
           <h1 className="font-serif text-4xl font-semibold text-[#111226]">{categoryLabel}</h1>
           <p className="mt-2 text-[#111226]/65">Selecione seus itens favoritos da Charme Joias Acessorios.</p>
           {searchTerm && (
-            <p className="mt-1 text-sm text-zinc-500">Busca: "{searchTerm}"</p>
+            <p className="mt-1 text-sm text-[#0b6f78]/70">Busca: "{searchTerm}"</p>
           )}
           {categoryTerm && (
-            <p className="mt-1 text-sm text-zinc-500">Categoria: {categoryLabel}</p>
+            <p className="mt-1 text-sm text-[#0b6f78]/70">Categoria: {categoryLabel}</p>
           )}
         </div>
       </div>
@@ -257,7 +241,7 @@ function Products() {
                     className="h-56 w-full object-cover"
                   />
                 </div>
-                <div className="flex items-center justify-between gap-3 text-zinc-400">
+                <div className="flex items-center justify-between gap-3 text-[#111226]/60">
                   <span className="rounded-full bg-[#0b6f78]/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-[#0b6f78]">Estoque {product.stock}</span>
                   <span className="text-sm font-semibold text-[#111226]">{formatPrice(product.price)}</span>
                 </div>

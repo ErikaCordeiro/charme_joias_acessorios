@@ -1,89 +1,68 @@
 import { useNavigate } from 'react-router-dom'
 
 const collections = [
-    {
-        id: 'ouro',
-        label: 'Coleção Ouro',
-        description: 'Clássicos que nunca saem de moda',
-        color: 'from-yellow-400/20 to-yellow-500/30',
-        border: 'border-yellow-400/40',
-        tag: 'bg-yellow-100 text-yellow-700',
-        icon: '✨',
-    },
-    {
-        id: 'prata',
-        label: 'Coleção Prata',
-        description: 'Brilho e sofisticação em cada detalhe',
-        color: 'from-gray-300/20 to-gray-400/30',
-        border: 'border-gray-400/40',
-        tag: 'bg-gray-100 text-gray-700',
-        icon: '💎',
-    },
-    {
-        id: 'exclusiva',
-        label: 'Coleção Exclusiva',
-        description: 'Peças únicas para momentos especiais',
-        color: 'from-rose-300/20 to-rose-400/30',
-        border: 'border-rose-400/40',
-        tag: 'bg-rose-100 text-rose-700',
-        icon: '👑',
-    },
+  {
+    id: 'ouro',
+    label: 'Colecao Ouro',
+    description: 'Classicos que nunca saem de moda.',
+    category: 'colares',
+    image: '/mockup/collection-gold.png',
+  },
+  {
+    id: 'prata',
+    label: 'Colecao Prata',
+    description: 'Brilho e sofisticacao em cada detalhe.',
+    category: 'brincos',
+    image: '/mockup/collection-silver.png',
+  },
+  {
+    id: 'exclusiva',
+    label: 'Colecao Exclusiva',
+    description: 'Pecas unicas para momentos especiais.',
+    category: 'presentes',
+    image: '/mockup/collection-exclusive.png',
+  },
 ]
 
 function CollectionsSection() {
-    const navigate = useNavigate()
+  const navigate = useNavigate()
 
-    const handleCollectionClick = (collectionId) => {
-        // Map collection to product categories
-        const categoryMap = {
-            ouro: 'presentes', // Products with gold color
-            prata: 'brincos', // Silver products
-            exclusiva: 'sale', // Exclusive products
-        }
-        const category = categoryMap[collectionId]
-        navigate(`/products?category=${category}`)
-    }
+  return (
+    <section id="colecoes" className="bg-white py-12 sm:py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-9 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d8a84f]">Curadoria Charme</p>
+          <h2 className="mt-2 font-serif text-3xl font-semibold text-[#062f35] sm:text-4xl">
+            Nossas colecoes
+          </h2>
+        </div>
 
-    return (
-        <section className="bg-[#fbf8f1] py-12 sm:py-16 lg:py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="mb-10 text-center">
-                    <h2 className="font-serif text-3xl font-semibold text-[#111226] sm:text-4xl">
-                        Nossas Coleções
-                    </h2>
-                    <p className="mt-3 text-[#111226]/65">Descubra as linhas exclusivas da Charme</p>
-                </div>
-
-                <div className="grid gap-6 md:grid-cols-3">
-                    {collections.map((collection) => (
-                        <button
-                            key={collection.id}
-                            onClick={() => handleCollectionClick(collection.id)}
-                            type="button"
-                            className={`group relative overflow-hidden rounded-2xl border-2 p-8 transition-all hover:scale-105 hover:shadow-lg ${collection.border}`}
-                        >
-                            <div
-                                className={`absolute inset-0 -z-10 bg-gradient-to-br ${collection.color} transition-all group-hover:to-current`}
-                            />
-
-                            <div className="text-4xl mb-4">{collection.icon}</div>
-
-                            <h3 className="text-left font-serif text-2xl font-semibold text-[#111226]">
-                                {collection.label}
-                            </h3>
-                            <p className="mt-2 text-left text-sm text-[#111226]/70">{collection.description}</p>
-
-                            <div className="mt-6 inline-flex">
-                                <span className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider ${collection.tag}`}>
-                                    Ver Coleção →
-                                </span>
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
+        <div className="grid gap-6 md:grid-cols-3">
+          {collections.map((collection) => (
+            <button
+              key={collection.id}
+              type="button"
+              onClick={() => navigate(`/products?category=${collection.category}`)}
+              className="group border border-[#0b6f78]/12 bg-[#fbf8f1] text-left transition hover:-translate-y-1 hover:border-[#d8a84f]/60 hover:shadow-[0_22px_60px_rgba(6,47,53,0.10)]"
+            >
+              <img
+                src={collection.image}
+                alt={collection.label}
+                className="h-48 w-full object-cover"
+              />
+              <div className="p-5 text-center">
+                <h3 className="font-serif text-xl font-semibold text-[#062f35]">{collection.label}</h3>
+                <p className="mt-2 text-sm text-[#111226]/65">{collection.description}</p>
+                <span className="mt-4 inline-flex border-b border-[#d8a84f] pb-1 text-xs font-bold uppercase tracking-[0.14em] text-[#062f35]">
+                  Ver colecao
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export default CollectionsSection

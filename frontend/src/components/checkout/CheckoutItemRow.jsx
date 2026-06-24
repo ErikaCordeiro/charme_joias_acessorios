@@ -1,4 +1,4 @@
-import { formatPrice } from '../../helpers/price'
+﻿import { formatPrice } from '../../helpers/price'
 
 const placeholderImage = (title) => {
   const text = encodeURIComponent(title || 'Produto')
@@ -10,9 +10,9 @@ function CheckoutItemRow({ item }) {
   const imageUrl = item.product?.image_url || placeholderImage(itemTitle)
 
   return (
-    <article className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-900 bg-zinc-950/60 p-4">
+    <article className="flex items-center justify-between gap-4 rounded-2xl border border-[#0b6f78]/12 bg-white p-4">
       <div className="flex items-center gap-3">
-        <div className="h-16 w-16 overflow-hidden rounded-xl border border-zinc-800 bg-black/80">
+        <div className="h-16 w-16 overflow-hidden rounded-xl border border-[#0b6f78]/12 bg-[#fbf8f1]">
           <img
             src={imageUrl}
             alt={itemTitle}
@@ -24,11 +24,11 @@ function CheckoutItemRow({ item }) {
           />
         </div>
         <div>
-          <p className="text-sm font-semibold text-zinc-100">{itemTitle}</p>
-          <p className="text-xs text-zinc-400">Qtd: {item.quantity} x {formatPrice(item.unit_price)}</p>
+          <p className="text-sm font-semibold text-[#062f35]">{itemTitle}</p>
+          <p className="text-xs text-[#111226]/60">Qtd: {item.quantity} x {formatPrice(item.unit_price)}</p>
         </div>
       </div>
-      <p className="text-sm font-semibold text-zinc-200">{formatPrice(item.line_total)}</p>
+      <p className="text-sm font-semibold text-[#111226]/75">{formatPrice(item.line_total)}</p>
     </article>
   )
 }
