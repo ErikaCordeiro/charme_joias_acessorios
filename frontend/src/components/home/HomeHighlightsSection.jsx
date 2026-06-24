@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom'
 
 import HomeHighlightCard from './HomeHighlightCard'
 
-function HomeHighlightsSection({ products, loading, error }) {
+function HomeHighlightsSection({ products = [], loading = false, error = '' }) {
+  const highlightProducts = Array.isArray(products) ? products : []
+
   return (
     <section className="bg-black pb-14 pt-10">
       <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-10">
@@ -27,7 +29,7 @@ function HomeHighlightsSection({ products, loading, error }) {
 
         {!loading && !error && (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            {products.map((product) => (
+            {highlightProducts.map((product) => (
               <HomeHighlightCard key={product.id} product={product} />
             ))}
           </div>
