@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import SearchModal from '../components/SearchModal'
+import HomeBrandSection from '../components/home/HomeBrandSection'
 import CollectionsSection from '../components/home/CollectionsSection'
 import HomeBenefitsBar from '../components/home/HomeBenefitsBar'
+import HomeFooter from '../components/home/HomeFooter'
 import HomeHeroSection from '../components/home/HomeHeroSection'
 import HomeHighlightsSection from '../components/home/HomeHighlightsSection'
 
@@ -96,9 +98,13 @@ function Home() {
 
       <HomeBenefitsBar />
 
+      <HomeBrandSection />
+
       <CollectionsSection />
 
       <HomeHighlightsSection products={featuredProducts} />
+
+      <HomeFooter />
 
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </main>
