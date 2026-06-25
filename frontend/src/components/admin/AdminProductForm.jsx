@@ -8,6 +8,15 @@ function AdminProductForm({
   onUploadImage,
   uploadingImage = false,
 }) {
+  const categories = [
+    { value: 'brincos', label: 'Brincos' },
+    { value: 'colares', label: 'Colares' },
+    { value: 'pulseiras', label: 'Pulseiras' },
+    { value: 'aneis', label: 'Aneis' },
+    { value: 'pingentes', label: 'Pingentes' },
+    { value: 'presentes', label: 'Presentes' },
+    { value: 'sale', label: 'Sale' },
+  ]
   const inputClass =
     'h-11 rounded-full border border-[#0A6772]/14 bg-[#FAFAF8] px-4 text-sm text-[#101827] outline-none transition placeholder:text-[#101827]/35 focus:border-[#0A6772] focus:bg-white focus:ring-4 focus:ring-[#0A6772]/10'
   const textareaClass =
@@ -45,13 +54,19 @@ function AdminProductForm({
           required
           className={inputClass}
         />
-        <input
-          type="text"
+        <select
           value={form.category}
           onChange={(event) => onChange('category', event.target.value)}
-          placeholder="Categoria"
+          required
           className={inputClass}
-        />
+        >
+          <option value="">Categoria</option>
+          {categories.map((category) => (
+            <option key={category.value} value={category.value}>
+              {category.label}
+            </option>
+          ))}
+        </select>
         <input
           type="number"
           min="0"

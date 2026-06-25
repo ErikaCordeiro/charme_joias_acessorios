@@ -11,9 +11,6 @@ import { hydrateCartWithProducts } from '../helpers/cartHydration'
 import {
   buildPaymentPayload,
   defaultPaymentForm,
-  formatCardCvv,
-  formatCardExpiry,
-  formatCardNumber,
   paymentMethods,
   validatePaymentForm,
 } from '../helpers/payment'
@@ -139,24 +136,6 @@ function Checkout() {
   const handlePaymentMethodChange = (nextMethod) => {
     setPaymentMethod(nextMethod)
     setError('')
-  }
-
-  const handlePaymentFieldChange = (field, value) => {
-    setPaymentForm((currentForm) => {
-      if (field === 'card_number') {
-        return { ...currentForm, card_number: formatCardNumber(value) }
-      }
-      if (field === 'card_expiry') {
-        return { ...currentForm, card_expiry: formatCardExpiry(value) }
-      }
-      if (field === 'card_cvv') {
-        return { ...currentForm, card_cvv: formatCardCvv(value) }
-      }
-      if (field === 'installments') {
-        return { ...currentForm, installments: Number(value) || 1 }
-      }
-      return { ...currentForm, [field]: value }
-    })
   }
 
   const handleCepBlur = useCallback(async () => {
@@ -435,9 +414,7 @@ function Checkout() {
         <div className="space-y-6">
           <CheckoutPaymentCard
             paymentMethod={paymentMethod}
-            paymentForm={paymentForm}
             onPaymentMethodChange={handlePaymentMethodChange}
-            onPaymentFieldChange={handlePaymentFieldChange}
           />
 
           <CheckoutSummaryCard

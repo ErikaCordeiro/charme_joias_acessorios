@@ -19,7 +19,7 @@ export const mapProductToForm = (product) => ({
 export const buildProductPayload = (form) => ({
   name: form.name.trim(),
   description: form.description.trim(),
-  category: form.category.trim(),
+  category: form.category.trim().toLowerCase(),
   price: Number(form.price),
   stock: Number(form.stock),
   image_url: form.image_url.trim() || null,

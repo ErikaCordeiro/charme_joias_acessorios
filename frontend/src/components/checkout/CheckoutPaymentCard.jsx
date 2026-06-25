@@ -2,9 +2,7 @@
 
 function CheckoutPaymentCard({
   paymentMethod,
-  paymentForm,
   onPaymentMethodChange,
-  onPaymentFieldChange,
 }) {
   return (
     <section className="rounded-3xl border border-[#0b6f78]/12 bg-white p-6 shadow-soft">
@@ -37,70 +35,15 @@ function CheckoutPaymentCard({
         ))}
       </div>
 
-      {paymentMethod === 'credit_card' && (
-        <div className="mt-5 space-y-3 rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1] p-4">
-          <input
-            type="text"
-            value={paymentForm.card_holder}
-            onChange={(event) => onPaymentFieldChange('card_holder', event.target.value)}
-            placeholder="Nome impresso no cartao"
-            className="h-11 w-full rounded-xl border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 text-sm text-[#062f35] outline-none transition placeholder:text-[#0b6f78]/60 focus:border-[#d8a84f]"
-          />
-
-          <input
-            type="text"
-            value={paymentForm.card_number}
-            onChange={(event) => onPaymentFieldChange('card_number', event.target.value)}
-            placeholder="Numero do cartao"
-            className="h-11 w-full rounded-xl border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 text-sm text-[#062f35] outline-none transition placeholder:text-[#0b6f78]/60 focus:border-[#d8a84f]"
-          />
-
-          <div className="grid gap-3 sm:grid-cols-3">
-            <input
-              type="text"
-              value={paymentForm.card_expiry}
-              onChange={(event) => onPaymentFieldChange('card_expiry', event.target.value)}
-              placeholder="MM/AA"
-              className="h-11 rounded-xl border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 text-sm text-[#062f35] outline-none transition placeholder:text-[#0b6f78]/60 focus:border-[#d8a84f]"
-            />
-
-            <input
-              type="text"
-              value={paymentForm.card_cvv}
-              onChange={(event) => onPaymentFieldChange('card_cvv', event.target.value)}
-              placeholder="CVV"
-              className="h-11 rounded-xl border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 text-sm text-[#062f35] outline-none transition placeholder:text-[#0b6f78]/60 focus:border-[#d8a84f]"
-            />
-
-            <select
-              value={paymentForm.installments}
-              onChange={(event) => onPaymentFieldChange('installments', Number(event.target.value))}
-              className="h-11 rounded-xl border border-[#0b6f78]/12 bg-[#fbf8f1] px-4 text-sm text-[#062f35] outline-none transition focus:border-[#d8a84f]"
-            >
-              {[1, 2, 3, 4, 5, 6].map((installment) => (
-                <option key={installment} value={installment} className="bg-[#fbf8f1]">
-                  {installment}x sem juros
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <p className="text-xs text-[#0b6f78]/60">
-            Sandbox: use <span className="text-[#111226]/70">4111 1111 1111 1111</span> para aprovar e
-            <span className="text-[#111226]/70"> 4000 0000 0000 0002</span> para simular recusa.
-          </p>
-        </div>
-      )}
-
       {paymentMethod === 'pix' && (
         <div className="mt-5 rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1] p-4 text-sm text-[#111226]/70">
-          O banco sandbox aprova o Pix automaticamente para facilitar testes de checkout.
+          O Pix esta em modo de testes. Para vender de verdade, integre Mercado Pago, Pagar.me, Stripe ou outro gateway.
         </div>
       )}
 
       {paymentMethod === 'boleto' && (
         <div className="mt-5 rounded-2xl border border-[#0b6f78]/12 bg-[#fbf8f1] p-4 text-sm text-[#111226]/70">
-          O boleto sera gerado para simulacao e o pedido ficara com status pendente ate compensacao.
+          O boleto esta em modo de testes e o pedido ficara pendente ate existir integracao bancaria real.
         </div>
       )}
     </section>

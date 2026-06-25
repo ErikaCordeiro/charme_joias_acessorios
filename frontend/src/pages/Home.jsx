@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 import SearchModal from '../components/SearchModal'
 import HomeBrandSection from '../components/home/HomeBrandSection'
@@ -8,41 +8,14 @@ import HomeBenefitsBar from '../components/home/HomeBenefitsBar'
 import HomeFooter from '../components/home/HomeFooter'
 import HomeHeroSection from '../components/home/HomeHeroSection'
 import HomeHighlightsSection from '../components/home/HomeHighlightsSection'
-
-const featuredProducts = [
-  {
-    id: 'home-colar-ponto-luz',
-    name: 'Colar Ponto de Luz',
-    price: 149.9,
-    category: 'Colares',
-    image_url: '/products/charme/conjunto-prata-ponto-luz.jpeg',
-  },
-  {
-    id: 'home-brinco-organico',
-    name: 'Brincos Organicos Dourados',
-    price: 129.9,
-    category: 'Brincos',
-    image_url: '/products/charme/brincos-organicos-dourados.jpeg',
-  },
-  {
-    id: 'home-anel-organico',
-    name: 'Anel Organico Dourado',
-    price: 119.9,
-    category: 'Aneis',
-    image_url: '/products/charme/conjunto-dourado-caixa.jpeg',
-  },
-  {
-    id: 'home-pulseira-laminada',
-    name: 'Pulseira Laminada Dourada',
-    price: 139.9,
-    category: 'Pulseiras',
-    image_url: '/products/charme/corrente-laminada-dourada.jpeg',
-  },
-]
+import api from '../services/api'
 
 function Home() {
   const navigate = useNavigate()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [featuredProducts, setFeaturedProducts] = useState([])
+  const [featuredLoading, setFeaturedLoading] = useState(true)
+  const [featuredError, setFeaturedError] = useState('')
   const menuItems = [
     { label: 'JOIAS', to: '/products' },
     { label: 'BRINCOS', to: '/products?category=brincos' },
@@ -54,20 +27,50 @@ function Home() {
     { label: 'SALE', to: '/products?category=sale' },
   ]
 
+  useEffect(() => {
+    let mounted = true
+
+    const loadFeaturedProducts = async () => {
+      setFeaturedLoading(true)
+      setFeaturedError('')
+      try {
+        const response = await api.get('/products', { params: { page: 1, size: 4 } })
+        if (mounted) {
+          setFeaturedProducts(response.data?.products || [])
+        }
+      } catch (loadError) {
+        console.error('Erro ao carregar produtos em destaque:', loadError)
+        if (mounted) {
+          setFeaturedProducts([])
+          setFeaturedError('Cadastre produtos no painel admin para exibir os mais vendidos.')
+        }
+      } finally {
+        if (mounted) {
+          setFeaturedLoading(false)
+        }
+      }
+    }
+
+    void loadFeaturedProducts()
+
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#fbf8f1]">
       <header className="sticky top-0 z-50 border-b border-[#062f35]/10 bg-[#fbfaf7]/98 backdrop-blur">
         <div className="mx-auto grid min-h-[56px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 sm:min-h-[62px] sm:gap-5 sm:px-5 lg:px-8">
           <nav className="hide-scrollbar flex min-w-0 items-center gap-5 overflow-x-auto whitespace-nowrap pr-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#062f35] sm:gap-7 sm:text-[11px] md:justify-center lg:gap-9 xl:gap-11">
             {menuItems.map((item) => (
-              <button
+              <Link
                 key={item.label}
-                type="button"
-                onClick={() => navigate(item.to)}
+                to={item.to}
                 className="shrink-0 py-4 leading-none transition hover:text-[#0A6772]"
               >
                 {item.label}
-              </button>
+              </Link>
             ))}
           </nav>
 
@@ -102,7 +105,7 @@ function Home() {
 
       <CollectionsSection />
 
-      <HomeHighlightsSection products={featuredProducts} />
+      <HomeHighlightsSection products={featuredProducts} loading={featuredLoading} error={featuredError} />
 
       <HomeFooter />
 

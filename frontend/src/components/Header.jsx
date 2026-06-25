@@ -26,11 +26,6 @@ function Header() {
   const productsMenuRef = useRef(null)
   const accountPath = token ? '/profile' : '/login'
 
-  const goTo = (to) => {
-    setProductsOpen(false)
-    navigate(to)
-  }
-
   const handleLogout = () => {
     clearStoredToken()
     setIsAdmin(false)
@@ -131,9 +126,16 @@ function Header() {
               <path d="m16.5 16.5 4 4" />
             </svg>
           </button>
-          <Link to={accountPath} className="shrink-0 rounded-full border border-[#0b6f78]/25 px-4 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78]">
-            Minha Conta
-          </Link>
+          {!isAdmin && (
+            <Link to={accountPath} className="shrink-0 rounded-full border border-[#0b6f78]/25 px-4 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78]">
+              Minha Conta
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/admin" className="shrink-0 rounded-full border border-[#0b6f78]/25 px-4 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78]">
+              Painel Admin
+            </Link>
+          )}
           {token && (
             <button
               type="button"
@@ -150,14 +152,14 @@ function Header() {
         <div className="border-t border-[#0b6f78]/10 bg-white shadow-[0_18px_50px_rgba(17,18,38,0.08)]">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 px-4 py-3 sm:grid-cols-4 sm:px-6 lg:grid-cols-8 lg:px-8">
             {productCategories.map((category) => (
-              <button
+              <Link
                 key={category.label}
-                type="button"
-                onClick={() => goTo(category.to)}
+                to={category.to}
+                onClick={() => setProductsOpen(false)}
                 className="rounded-xl px-3 py-3 text-left text-sm font-medium text-[#111226]/72 transition hover:bg-[#0b6f78]/8 hover:text-[#0b6f78] sm:text-center"
               >
                 {category.label}
-              </button>
+              </Link>
             ))}
           </div>
         </div>

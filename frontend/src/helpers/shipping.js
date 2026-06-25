@@ -13,21 +13,3 @@ export const estimateCartWeight = (items) => {
   const estimatedWeight = totalUnits * 0.35
   return Number(estimatedWeight.toFixed(2))
 }
-
-export const paymentMethods = [
-  {
-    id: 'pix',
-    title: 'Pix',
-    description: 'Aprovacao imediata e confirmacao rapida do pedido.',
-  },
-  {
-    id: 'credit_card',
-    title: 'Cartao de credito',
-    description: 'Parcelamento em ate 6x sem juros.',
-  },
-  {
-    id: 'boleto',
-    title: 'Boleto bancario',
-    description: 'Compensacao em ate 2 dias uteis.',
-  },
-]

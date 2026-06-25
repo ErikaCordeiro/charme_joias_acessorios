@@ -39,80 +39,6 @@ const isCharmeProduct = (product) => {
   return allowedCategories.has(category) || imageUrl.includes('/products/charme/')
 }
 
-const fallbackProducts = [
-  {
-    id: 'local-brincos',
-    name: 'Brincos Organicos Dourados',
-    description: 'Brincos dourados com formas fluidas para composicoes elegantes.',
-    price: 129,
-    stock: 18,
-    category: 'brincos',
-    image_url: '/products/charme/brincos-organicos-dourados.jpeg',
-  },
-  {
-    id: 'local-colar',
-    name: 'Corrente e Brincos Dourados',
-    description: 'Corrente robusta com acabamento dourado para um visual marcante.',
-    price: 215,
-    stock: 10,
-    category: 'colares',
-    image_url: '/products/charme/corrente-e-brincos-dourados.jpeg',
-  },
-  {
-    id: 'local-pingente',
-    name: 'Pingente Escapulario',
-    description: 'Pingente escapulario delicado em banho dourado.',
-    price: 156,
-    stock: 16,
-    category: 'pingentes',
-    image_url: '/products/charme/colares-escapulario.jpeg',
-  },
-  {
-    id: 'local-pulseira',
-    name: 'Pulseira Laminada Dourada',
-    description: 'Pulseira dourada laminada com acabamento luminoso e elegante.',
-    price: 215,
-    stock: 14,
-    category: 'pulseiras',
-    image_url: '/products/charme/corrente-laminada-dourada.jpeg',
-  },
-  {
-    id: 'local-anel',
-    name: 'Anel Organico Dourado',
-    description: 'Anel dourado com desenho organico e acabamento premium.',
-    price: 119.9,
-    stock: 10,
-    category: 'aneis',
-    image_url: '/products/charme/conjunto-dourado-caixa.jpeg',
-  },
-  {
-    id: 'local-presente',
-    name: 'Presente Coracao Dourado',
-    description: 'Selecao dourada com detalhes de coracao para presentear.',
-    price: 198,
-    stock: 10,
-    category: 'presentes',
-    image_url: '/products/charme/conjunto-coracao-dourado.jpeg',
-  },
-  {
-    id: 'local-sale',
-    name: 'Conjunto Vermelho Sale',
-    description: 'Acessorios em vermelho profundo em condicao especial.',
-    price: 185,
-    stock: 9,
-    category: 'sale',
-    image_url: '/products/charme/conjunto-vermelho-dourado.jpeg',
-  },
-]
-
-const getFallbackProducts = (category) => {
-  if (!category || category === 'joias') {
-    return fallbackProducts
-  }
-
-  return fallbackProducts.filter((product) => product.category === category)
-}
-
 function Products() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -142,11 +68,11 @@ function Products() {
         const response = await api.get('/products', { params })
         const apiProducts = response.data.products || []
         const charmeProducts = apiProducts.filter(isCharmeProduct)
-        setProducts(charmeProducts.length > 0 ? charmeProducts : getFallbackProducts(categoryTerm))
+        setProducts(charmeProducts)
       } catch (fetchError) {
         console.error('Erro ao buscar produtos:', fetchError)
-        setProducts(getFallbackProducts(categoryTerm))
-        setError('')
+        setProducts([])
+        setError('Nao foi possivel carregar os produtos agora.')
       } finally {
         setLoading(false)
       }

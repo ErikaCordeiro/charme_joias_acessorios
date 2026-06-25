@@ -32,7 +32,13 @@ function HomeHighlightsSection({ products = [], loading = false, error = '' }) {
           </div>
         )}
 
-        {!loading && !error && (
+        {!loading && !error && highlightProducts.length === 0 && (
+          <div className="border border-[#0b6f78]/10 bg-white p-6 text-[#111226]/65">
+            Cadastre produtos no painel admin para exibir esta vitrine.
+          </div>
+        )}
+
+        {!loading && !error && highlightProducts.length > 0 && (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {highlightProducts.map((product) => (
               <HomeHighlightCard key={product.id} product={product} />
