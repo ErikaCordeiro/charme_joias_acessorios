@@ -43,7 +43,7 @@ function Register() {
         city: addressData.city,
         state: addressData.state,
       }))
-      setSuccess('EndereÃ§o encontrado! Verifique os dados.')
+      setSuccess('Endereco encontrado! Verifique os dados.')
     }
   }
 
@@ -69,13 +69,11 @@ function Register() {
       console.error('Erro no registro:', registerError)
       const serverMessage = registerError?.response?.data?.detail
       const status = registerError?.response?.status
-      const axiosMessage = registerError?.message
+      const friendlyMessage = registerError?.friendlyMessage
       setError(
         typeof serverMessage === 'string'
           ? `Erro ${status}: ${serverMessage}`
-          : axiosMessage
-            ? `Erro de conexao: ${axiosMessage}`
-            : 'Nao foi possivel completar o cadastro. Revise os dados e tente novamente.'
+          : friendlyMessage || 'Nao foi possivel completar o cadastro. Revise os dados e tente novamente.'
       )
     } finally {
       setLoading(false)

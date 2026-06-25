@@ -29,13 +29,11 @@ function Login() {
       console.error('Erro no login:', loginError)
       const serverMessage = loginError?.response?.data?.detail
       const status = loginError?.response?.status
-      const axiosMessage = loginError?.message
+      const friendlyMessage = loginError?.friendlyMessage
       setError(
         serverMessage
           ? `Erro ${status}: ${serverMessage}`
-          : axiosMessage
-            ? 'Nao foi possivel conectar ao servidor. Verifique se o ambiente de teste esta ativo.'
-            : 'Nao foi possivel entrar. Verifique seus dados.'
+          : friendlyMessage || 'Nao foi possivel entrar. Verifique seus dados.'
       )
     } finally {
       setLoading(false)

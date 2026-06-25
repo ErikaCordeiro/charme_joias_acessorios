@@ -42,10 +42,10 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def on_startup() -> None:
-    if settings.AUTO_CREATE_SCHEMA:
-        async with engine.begin() as conn:
+    async with engine.begin() as conn:
+        if settings.AUTO_CREATE_SCHEMA:
             await conn.run_sync(Base.metadata.create_all)
-            await conn.run_sync(sync_schema)
+        await conn.run_sync(sync_schema)
 
     if settings.SEED_DEFAULT_PRODUCTS:
         try:
@@ -92,6 +92,15 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code,
         content={"detail": exc.detail},
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled exception on {request.method} {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Erro interno do servidor. Verifique os logs da API no Render."},
     )
 
 
