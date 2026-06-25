@@ -1,112 +1,147 @@
-# Deploy no Neon + Render
+# Deploy 100% no Render
 
-Arquitetura:
+Arquitetura oficial:
 
-- PostgreSQL: Neon
-- Backend FastAPI: Render Web Service
-- Frontend React/Vite: Render Static Site
+- PostgreSQL: Render PostgreSQL
+- Backend FastAPI: Render Web Service `charme-joias-api`
+- Frontend React/Vite: Render Static Site `charme-joias-web`
 - Midia: Cloudinary opcional
 
-## 1. Neon PostgreSQL
+Nao misture Neon, Supabase ou outro banco com o Render neste projeto. A API, as migrations, o Shell e o admin devem usar a mesma variavel `DATABASE_URL`.
 
-1. Crie um projeto no Neon.
-2. Abra **Connect** e copie a connection string PostgreSQL.
-3. Prefira a URL pooled para a aplicacao web.
-4. Configure a URL completa somente como `DATABASE_URL` no backend do Render.
+## 1. PostgreSQL no Render
 
-Formato esperado:
+1. No Render, crie um PostgreSQL para o projeto.
+2. Nome recomendado: `charme-joias-db`.
+3. Copie a **Internal Database URL**.
+4. No servico `charme-joias-api`, configure `DATABASE_URL` com essa URL interna.
 
-```env
-DATABASE_URL=postgresql://usuario:senha@ep-exemplo-pooler.regiao.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+Se usar o Blueprint `render.yaml`, o banco `charme-joias-db` ja fica declarado e o `DATABASE_URL` da API e preenchido pelo Render.
+
+## 2. API no Render
+
+Servico: `charme-joias-api`
+
+Build command:
+
+```bash
+pip install --upgrade pip && pip install -r requirements.txt
 ```
 
-O backend converte a URL para `postgresql+asyncpg`, preserva SSL, remove o parametro `channel_binding` incompatível com asyncpg e desativa o cache de prepared statements em conexoes pooled.
+Start command:
 
-Nunca coloque `DATABASE_URL` no frontend ou no repositorio.
+```bash
+alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
 
-## 2. Blueprint no Render
-
-1. Conecte o repositorio GitHub ao Render.
-2. Selecione **New > Blueprint**.
-3. Escolha o repositorio e confirme o `render.yaml`.
-4. O Render criara `charme-joias-api` e `charme-joias-web`.
-
-### Variaveis do backend
+Variaveis principais:
 
 ```env
-DATABASE_URL=<URL-DO-NEON>
-SECRET_KEY=<gerada-pelo-Render>
+DATABASE_URL=<Internal Database URL do Render PostgreSQL>
+SECRET_KEY=<gerada pelo Render ou valor forte>
 ENVIRONMENT=production
 ADMIN_EMAILS=cjoiaseacessorios@gmail.com
-CORS_ORIGINS=https://URL-DO-FRONTEND.onrender.com
-FRONTEND_URL=https://URL-DO-FRONTEND.onrender.com
+CORS_ORIGINS=https://charme-joias-web.onrender.com
+FRONTEND_URL=https://charme-joias-web.onrender.com
 SEED_DEFAULT_PRODUCTS=false
 AUTO_CREATE_SCHEMA=false
 ```
 
-Cloudinary, se utilizado:
+Cloudinary, se for usar upload:
 
 ```env
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
+CLOUDINARY_DEFAULT_FOLDER=charme/produtos
 ```
 
-O start command executa `alembic upgrade head` antes do Uvicorn.
+## 3. Web no Render
 
-### Variaveis do frontend
+Servico: `charme-joias-web`
+
+Root directory:
+
+```txt
+frontend
+```
+
+Build command:
+
+```bash
+npm ci && npm run build
+```
+
+Publish directory:
+
+```txt
+dist
+```
+
+Variaveis:
 
 ```env
-VITE_API_BASE_URL=https://URL-DO-BACKEND.onrender.com/api/v1
-VITE_SITE_URL=https://URL-DO-FRONTEND.onrender.com
+VITE_API_BASE_URL=https://charme-joias-api.onrender.com/api/v1
+VITE_SITE_URL=https://charme-joias-web.onrender.com
 VITE_SITE_NAME=Charme Joias e Acessorios
 ```
 
-Como o Blueprint define `rootDir: frontend`, o build usa `npm ci && npm run build` e publica `dist`. Em uma configuracao manual sem `rootDir`, use `cd frontend && npm ci && npm run build` e publique `frontend/dist`.
+## 4. Shell do Render
 
-## 3. Admin principal
+Todos os comandos abaixo devem ser executados no Shell do servico `charme-joias-api`.
 
-O cadastro publico nunca concede permissao administrativa, mesmo quando o email aparece em `ADMIN_EMAILS`.
+Primeiro rode as migrations:
 
-Para criar ou promover o admin principal, configure localmente `DATABASE_URL` com a URL Neon e execute:
-
-```powershell
-$env:ADMIN_EMAIL='cjoiaseacessorios@gmail.com'
-python scripts/create_admin_local.py
+```bash
+alembic upgrade head
 ```
 
-O script solicita uma senha de 10 a 72 caracteres, com letras e numeros, sem exibi-la. Nao salve a senha no repositorio ou permanentemente no Render.
+Depois crie ou atualize o admin:
 
-## 4. Catalogo inicial
-
-Com `SEED_DEFAULT_PRODUCTS=false`, rode uma vez:
-
-```powershell
-python scripts/seed.py
+```bash
+ADMIN_EMAIL=cjoiaseacessorios@gmail.com ADMIN_PASSWORD="troque-esta-senha" python scripts/create_admin_local.py
 ```
 
-Execute com `DATABASE_URL` apontando para o Neon. O seed sincroniza apenas o catalogo Charme.
+Para confirmar se o banco correto esta sendo usado:
+
+```bash
+python - <<'PY'
+import asyncio
+from sqlalchemy import text
+from app.database import engine
+
+async def main():
+    async with engine.connect() as conn:
+        result = await conn.execute(text(
+            "select table_name from information_schema.tables "
+            "where table_schema='public' order by table_name"
+        ))
+        print(result.fetchall())
+
+asyncio.run(main())
+PY
+```
+
+O resultado esperado deve incluir `users`, `products`, `carts`, `orders`, `cart_items` e `order_items`.
 
 ## 5. Validacao
 
-- API: `https://URL-DO-BACKEND.onrender.com/healthz`
-- Banco: `https://URL-DO-BACKEND.onrender.com/readyz`
-- Docs: `https://URL-DO-BACKEND.onrender.com/docs`
-- Produtos: `https://URL-DO-BACKEND.onrender.com/api/v1/products/`
-- Frontend: URL do Static Site
+Depois do deploy:
 
-`/healthz` verifica o processo da API. `/readyz` executa `SELECT 1` no Neon.
+- API: `https://charme-joias-api.onrender.com/healthz`
+- Banco: `https://charme-joias-api.onrender.com/readyz`
+- Docs: `https://charme-joias-api.onrender.com/docs`
+- Produtos: `https://charme-joias-api.onrender.com/api/v1/products/`
+- Frontend: `https://charme-joias-web.onrender.com`
 
-## 6. Ordem recomendada
+Teste manualmente:
 
-1. Criar Neon.
-2. Criar Blueprint no Render.
-3. Configurar `DATABASE_URL`, CORS e URLs.
-4. Aguardar a migration e o health check.
-5. Rodar o seed uma vez.
-6. Criar o admin principal.
-7. Testar login, produtos, carrinho, checkout, conta e dashboard.
+1. Cadastro de cliente.
+2. Login de cliente.
+3. Login do admin.
+4. Dashboard admin.
+5. Produtos, carrinho e checkout.
 
-## 7. Observacao de pagamento
+## 6. Pagamento
 
-O checkout atual usa um simulador bancario sandbox. Ele nao processa pagamentos reais. Antes de aceitar vendas reais, integre um provedor de pagamento, valide webhooks e implemente idempotencia.
+O checkout atual ainda usa fluxo simulado. Antes de vender de verdade, integre um provedor de pagamento, valide webhooks e implemente idempotencia.

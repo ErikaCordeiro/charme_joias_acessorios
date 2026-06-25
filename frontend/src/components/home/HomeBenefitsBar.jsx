@@ -1,5 +1,5 @@
 const benefitItems = [
-  { title: 'Frete gratis', subtitle: 'Acima de R$ 699' },
+  { title: 'Entrega segura', subtitle: 'Frete calculado no checkout' },
   { title: 'Compra segura', subtitle: 'Seus dados protegidos' },
   { title: 'Qualidade premium', subtitle: 'Semijoias selecionadas' },
 ]

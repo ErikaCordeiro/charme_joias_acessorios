@@ -4,7 +4,7 @@ E-commerce em React + Vite com API FastAPI, SQLAlchemy assincorno e PostgreSQL.
 
 ## Producao
 
-- Banco: Neon PostgreSQL
+- Banco: Render PostgreSQL
 - API: Render Web Service
 - Frontend: Render Static Site
 - Midia: Cloudinary
@@ -57,7 +57,7 @@ URLs:
 Use `.env.example` como base:
 
 ```env
-DATABASE_URL=postgresql://usuario:senha@ep-exemplo-pooler.regiao.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+DATABASE_URL=postgresql://usuario:senha@host:5432/charme_joias
 SECRET_KEY=<segredo-aleatorio-com-32-ou-mais-caracteres>
 ENVIRONMENT=production
 ADMIN_EMAILS=cjoiaseacessorios@gmail.com
@@ -77,7 +77,7 @@ VITE_SITE_URL=https://seu-frontend.onrender.com
 VITE_SITE_NAME=Charme Joias e Acessorios
 ```
 
-Somente valores publicos usam o prefixo `VITE_`. Credenciais Neon, JWT e Cloudinary nunca devem ir para o frontend.
+Somente valores publicos usam o prefixo `VITE_`. Credenciais do banco, JWT e Cloudinary nunca devem ir para o frontend.
 
 ## Migrations
 
@@ -91,9 +91,11 @@ As migrations usam exclusivamente `DATABASE_URL`. Em producao, `AUTO_CREATE_SCHE
 
 ## Admin principal
 
-```powershell
-$env:ADMIN_EMAIL='cjoiaseacessorios@gmail.com'
-python scripts/create_admin_local.py
+No Shell do servico `charme-joias-api` no Render:
+
+```bash
+alembic upgrade head
+ADMIN_EMAIL=cjoiaseacessorios@gmail.com ADMIN_PASSWORD="troque-esta-senha" python scripts/create_admin_local.py
 ```
 
 O script usa o banco configurado em `DATABASE_URL`, solicita uma senha forte e grava somente o hash bcrypt. Cadastro publico nunca concede role admin.
