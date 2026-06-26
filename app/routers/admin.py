@@ -9,7 +9,9 @@ from app.schemas.admin import (
     AdminDashboardResponse,
     AdminOrderResponse,
 )
+from app.schemas.site import HomeContentResponse, HomeContentUpdate
 from app.services.admin import AdminService
+from app.services.site_content import SiteContentService
 
 router = APIRouter(
     prefix="/admin",
@@ -49,3 +51,18 @@ async def list_abandoned_carts(
 ):
     admin_service = AdminService(db)
     return await admin_service.list_abandoned_carts(limit=limit)
+
+
+@router.get("/home-content", response_model=HomeContentResponse)
+async def get_home_content(db: AsyncSession = Depends(get_async_session)):
+    site_service = SiteContentService(db)
+    return await site_service.get_home_content()
+
+
+@router.put("/home-content", response_model=HomeContentResponse)
+async def update_home_content(
+    data: HomeContentUpdate,
+    db: AsyncSession = Depends(get_async_session),
+):
+    site_service = SiteContentService(db)
+    return await site_service.update_home_content(data)

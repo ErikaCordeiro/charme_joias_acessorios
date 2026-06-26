@@ -15,6 +15,7 @@ from app.routers.shipping import router as shipping_router
 from app.routers.order import router as order_router
 from app.routers.admin import router as admin_router
 from app.routers.media import router as media_router
+from app.routers.site import router as site_router
 from app.core.exceptions import AppException
 from app.services.catalog_seed import sync_default_products
 
@@ -67,6 +68,7 @@ api_v1_router.include_router(shipping_router)
 api_v1_router.include_router(order_router)
 api_v1_router.include_router(admin_router)
 api_v1_router.include_router(media_router)
+api_v1_router.include_router(site_router)
 app.include_router(api_v1_router)
 
 @app.middleware("http")

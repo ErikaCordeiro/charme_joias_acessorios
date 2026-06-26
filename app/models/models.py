@@ -47,6 +47,27 @@ class Product(Base):
     order_items: Mapped[list["OrderItem"]] = relationship("OrderItem", back_populates="product")
 
 
+class SiteContent(Base):
+    __tablename__ = "site_contents"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    key: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=False)
+    eyebrow: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    body_primary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    body_secondary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    cta_label: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
+    cta_url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    image_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    image_alt: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+
 class Cart(Base):
     __tablename__ = "carts"
 

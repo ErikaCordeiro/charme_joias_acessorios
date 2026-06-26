@@ -76,14 +76,14 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#0b6f78]/10 bg-[#fbf8f1]/98 backdrop-blur">
-      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] gap-x-4 gap-y-3 px-4 py-3 sm:px-6 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] gap-x-3 gap-y-3 px-3 py-3 sm:px-5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-8">
         <Link to="/" className="col-start-2 -col-end-1 justify-self-center font-serif text-2xl font-semibold leading-tight tracking-tight text-[#0b6f78] sm:text-3xl lg:col-start-1 lg:col-end-2 lg:justify-self-start">
           Charme
           <span className="block">Joias</span>
         </Link>
 
-        <nav className="hide-scrollbar order-3 col-span-3 -col-end-1 flex min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm text-[#111226]/72 lg:order-none lg:col-span-1 lg:col-start-2 lg:col-end-3 lg:justify-center lg:gap-3 sm:col-span-1 sm:col-start-2 sm:col-end-3">
-          <Link to="/" className="shrink-0 rounded-full px-4 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78]">
+        <nav className="hide-scrollbar order-3 col-span-3 -mx-1 flex min-w-0 items-center gap-1 overflow-x-auto whitespace-nowrap px-1 text-sm text-[#111226]/72 sm:col-span-1 sm:col-start-2 sm:col-end-3 lg:order-none lg:col-span-1 lg:col-start-2 lg:col-end-3 lg:justify-center lg:gap-3">
+          <Link to="/" className="shrink-0 rounded-full px-3 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78] lg:px-4">
             Inicio
           </Link>
 
@@ -92,7 +92,7 @@ function Header() {
               type="button"
               onClick={() => setProductsOpen((open) => !open)}
               aria-expanded={productsOpen}
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78]"
+              className="inline-flex items-center gap-2 rounded-full px-3 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78] lg:px-4"
             >
               Produtos
               <svg aria-hidden="true" viewBox="0 0 12 12" className={`h-3 w-3 fill-none stroke-current stroke-[1.5] transition ${productsOpen ? 'rotate-180' : ''}`}>
@@ -101,25 +101,25 @@ function Header() {
             </button>
           </div>
 
-          <Link to="/about" className="shrink-0 rounded-full px-4 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78]">
+          <Link to="/about" className="shrink-0 rounded-full px-3 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78] lg:px-4">
             Sobre nos
           </Link>
-          <Link to="/cart" className="shrink-0 rounded-full px-4 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78]">
+          <Link to="/cart" className="shrink-0 rounded-full px-3 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78] lg:px-4">
             Carrinho
           </Link>
           {isAdmin && (
-            <Link to="/admin" className="shrink-0 rounded-full px-4 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78]">
+            <Link to="/admin" className="shrink-0 rounded-full px-3 py-2 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78] lg:px-4">
               Admin
             </Link>
           )}
         </nav>
 
-        <div className="ml-auto flex items-center justify-end gap-2 self-start lg:self-center">
+        <div className="ml-auto flex items-center justify-end gap-1 self-start sm:gap-2 lg:self-center">
           <button
             type="button"
             onClick={() => setIsSearchOpen(true)}
             aria-label="Buscar"
-            className="rounded-full px-3 py-2 text-[#111226]/72 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78]"
+            className="rounded-full px-2 py-2 text-[#111226]/72 transition hover:bg-[#0b6f78]/10 hover:text-[#0b6f78] sm:px-3"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-[1.6]">
               <circle cx="11" cy="11" r="7" />
@@ -127,12 +127,12 @@ function Header() {
             </svg>
           </button>
           {!isAdmin && (
-            <Link to={accountPath} className="shrink-0 rounded-full border border-[#0b6f78]/25 px-4 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78]">
+            <Link to={accountPath} className="shrink-0 rounded-full border border-[#0b6f78]/25 px-3 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78] sm:px-4">
               Minha Conta
             </Link>
           )}
           {isAdmin && (
-            <Link to="/admin" className="shrink-0 rounded-full border border-[#0b6f78]/25 px-4 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78]">
+            <Link to="/admin" className="shrink-0 rounded-full border border-[#0b6f78]/25 px-3 py-2 text-sm text-[#111226]/72 transition hover:border-[#0b6f78] hover:text-[#0b6f78] sm:px-4">
               Painel Admin
             </Link>
           )}

@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom'
 
 import AdminAbandonedCartsTable from '../components/admin/AdminAbandonedCartsTable'
 import AdminCustomersTable from '../components/admin/AdminCustomersTable'
+import AdminHomeContentForm from '../components/admin/AdminHomeContentForm'
 import AdminMetricCard from '../components/admin/AdminMetricCard'
 import AdminOrdersTable from '../components/admin/AdminOrdersTable'
 import AdminProductForm from '../components/admin/AdminProductForm'
 import AdminProductsTable from '../components/admin/AdminProductsTable'
 import { buildProductPayload, emptyProductForm, mapProductToForm } from '../helpers/admin'
+import { buildHomeContentPayload, defaultHomeContent, mapHomeContentToForm } from '../helpers/homeContent'
 import { formatPrice } from '../helpers/price'
 import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
-const adminSections = ['Dashboard', 'Produtos', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
+const adminSections = ['Dashboard', 'Conteudo Home', 'Produtos', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
 
 function AdminDashboard() {
   const token = getStoredToken()
@@ -21,6 +23,8 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(Boolean(token))
   const [savingProduct, setSavingProduct] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [savingHomeContent, setSavingHomeContent] = useState(false)
+  const [uploadingHomeImage, setUploadingHomeImage] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -32,18 +36,20 @@ function AdminDashboard() {
 
   const [productForm, setProductForm] = useState({ ...emptyProductForm })
   const [editingProductId, setEditingProductId] = useState(null)
+  const [homeContentForm, setHomeContentForm] = useState({ ...defaultHomeContent })
 
   const loadAdminData = useCallback(async () => {
     setLoading(true)
     setError('')
 
     try {
-      const [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes] = await Promise.all([
+      const [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes, homeContentRes] = await Promise.all([
         api.get('/admin/dashboard'),
         api.get('/admin/customers', { params: { limit: 300 } }),
         api.get('/admin/orders', { params: { limit: 300 } }),
         api.get('/admin/abandoned-carts', { params: { limit: 300 } }),
         api.get('/products', { params: { page: 1, size: 100 } }),
+        api.get('/admin/home-content'),
       ])
 
       setMetrics(dashboardRes.data.metrics)
@@ -51,6 +57,7 @@ function AdminDashboard() {
       setOrders(ordersRes.data)
       setAbandonedCarts(abandonedRes.data)
       setProducts(productsRes.data.products || [])
+      setHomeContentForm(mapHomeContentToForm(homeContentRes.data))
     } catch (loadError) {
       console.error('Erro ao carregar dashboard admin:', loadError)
       const status = loadError?.response?.status
@@ -99,6 +106,51 @@ function AdminDashboard() {
   const resetProductForm = () => {
     setEditingProductId(null)
     setProductForm({ ...emptyProductForm })
+  }
+
+  const handleHomeContentFieldChange = (field, value) => {
+    setHomeContentForm((currentForm) => ({ ...currentForm, [field]: value }))
+  }
+
+  const handleSubmitHomeContent = async () => {
+    setSavingHomeContent(true)
+    setError('')
+
+    try {
+      const response = await api.put('/admin/home-content', buildHomeContentPayload(homeContentForm))
+      setHomeContentForm(mapHomeContentToForm(response.data))
+      setSuccess('Conteudo da home atualizado com sucesso.')
+    } catch (submitError) {
+      console.error('Erro ao salvar conteudo da home:', submitError)
+      const serverMessage = submitError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel salvar o conteudo da home.')
+    } finally {
+      setSavingHomeContent(false)
+    }
+  }
+
+  const handleUploadHomeImage = async (file) => {
+    setUploadingHomeImage(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'charme/banners')
+
+      const response = await api.post('/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      handleHomeContentFieldChange('image_url', response.data.secure_url)
+      setSuccess('Imagem da home enviada ao Cloudinary com sucesso.')
+    } catch (uploadError) {
+      console.error('Erro ao enviar imagem da home:', uploadError)
+      const serverMessage = uploadError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel enviar a imagem da home.')
+    } finally {
+      setUploadingHomeImage(false)
+    }
   }
 
   const handleSubmitProduct = async () => {
@@ -217,7 +269,7 @@ function AdminDashboard() {
           {adminSections.map((section) => (
             <a
               key={section}
-              href={section === 'Dashboard' ? '#dashboard' : `#${section.toLowerCase()}`}
+              href={section === 'Dashboard' ? '#dashboard' : `#${section.toLowerCase().replaceAll(' ', '-')}`}
               className="shrink-0 rounded-full border border-[#0A6772]/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#101827]/62 transition hover:border-[#0A6772]/35 hover:text-[#0A6772]"
             >
               {section}
@@ -247,6 +299,15 @@ function AdminDashboard() {
           <AdminMetricCard title="Abandonados" value={metrics.abandoned_carts} subtitle={`${metrics.abandoned_items} itens`} />
         </div>
       )}
+
+      <AdminHomeContentForm
+        form={homeContentForm}
+        loading={savingHomeContent}
+        uploadingImage={uploadingHomeImage}
+        onChange={handleHomeContentFieldChange}
+        onSubmit={handleSubmitHomeContent}
+        onUploadImage={handleUploadHomeImage}
+      />
 
       <div id="produtos" className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <AdminProductForm
