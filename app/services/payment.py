@@ -2,6 +2,7 @@ import random
 import string
 
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.payment import (
     PaymentMethod,
@@ -9,13 +10,17 @@ from app.schemas.payment import (
     PaymentSimulationResponse,
     PaymentStatus,
 )
+from app.services.store_settings import StoreSettingsService
 
 BANK_PROVIDER_NAME = "Banco Charme Joias Sandbox"
 PIX_COPY_AND_PASTE_PREFIX = "00020101021126580014BR.GOV.BCB.PIX0136charmejoias@sandbox.com5204000053039865406"
 
 
 class PaymentService:
-    def simulate_payment(
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
+    async def simulate_payment(
         self,
         *,
         amount: float,
@@ -27,29 +32,42 @@ class PaymentService:
                 detail="Valor do pedido invalido para pagamento.",
             )
 
+        settings = await StoreSettingsService(self.db).get_payment_settings()
+
         if payment_data.method == PaymentMethod.pix:
-            return self._simulate_pix()
+            if not settings.pix_enabled:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Pix indisponivel no momento.",
+                )
+            return self._simulate_pix(settings.provider, settings.pix_key)
 
-        return self._simulate_boleto()
+        if not settings.boleto_enabled:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Boleto indisponivel no momento.",
+            )
+        return self._simulate_boleto(settings.provider)
 
-    def _simulate_pix(self) -> PaymentSimulationResponse:
+    def _simulate_pix(self, provider: str, pix_key: str | None) -> PaymentSimulationResponse:
         pix_payload_suffix = self._random_alphanumeric(size=14)
+        pix_reference = pix_key or "charmejoias@sandbox.com"
         pix_copy_paste = f"{PIX_COPY_AND_PASTE_PREFIX}{pix_payload_suffix}6304ABCD"
 
         return PaymentSimulationResponse(
-            provider=BANK_PROVIDER_NAME,
+            provider=provider or BANK_PROVIDER_NAME,
             method=PaymentMethod.pix,
             status=PaymentStatus.approved,
             transaction_id=self._random_code(prefix="PIX", size=12),
-            message="Pagamento PIX aprovado instantaneamente no ambiente de testes.",
+            message=f"Pagamento Pix registrado em modo de testes para a chave {pix_reference}.",
             pix_copy_paste=pix_copy_paste,
             estimated_settlement_days=0,
         )
 
-    def _simulate_boleto(self) -> PaymentSimulationResponse:
+    def _simulate_boleto(self, provider: str) -> PaymentSimulationResponse:
         boleto_number = "".join(random.choices(string.digits, k=48))
         return PaymentSimulationResponse(
-            provider=BANK_PROVIDER_NAME,
+            provider=provider or BANK_PROVIDER_NAME,
             method=PaymentMethod.boleto,
             status=PaymentStatus.pending,
             transaction_id=self._random_code(prefix="BOL", size=12),

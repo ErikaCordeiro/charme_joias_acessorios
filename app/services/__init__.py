@@ -6,6 +6,7 @@ from .payment import PaymentService
 from .order import OrderService
 from .admin import AdminService
 from .catalog_seed import sync_default_products
+from .store_settings import StoreSettingsService
 
 __all__ = [
     "AuthService",
@@ -15,5 +16,6 @@ __all__ = [
     "PaymentService",
     "OrderService",
     "AdminService",
+    "StoreSettingsService",
     "sync_default_products",
 ]

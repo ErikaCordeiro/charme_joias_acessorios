@@ -41,7 +41,7 @@ class OrderService:
         estimated_weight = sum(
             item.quantity * ESTIMATED_ITEM_WEIGHT_KG for item, _product in cart_items
         )
-        shipping_quote = await ShippingService().calculate_shipping(
+        shipping_quote = await ShippingService(self.db).calculate_shipping(
             ShippingCalculate(
                 cep=order_data.shipping_cep,
                 weight=estimated_weight,
@@ -59,8 +59,8 @@ class OrderService:
                     detail=f"Insufficient stock for product {product.name}"
                 )
 
-        payment_service = PaymentService()
-        payment_result = payment_service.simulate_payment(
+        payment_service = PaymentService(self.db)
+        payment_result = await payment_service.simulate_payment(
             amount=total,
             payment_data=order_data.payment,
         )

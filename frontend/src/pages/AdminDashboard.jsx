@@ -6,8 +6,10 @@ import AdminCustomersTable from '../components/admin/AdminCustomersTable'
 import AdminHomeContentForm from '../components/admin/AdminHomeContentForm'
 import AdminMetricCard from '../components/admin/AdminMetricCard'
 import AdminOrdersTable from '../components/admin/AdminOrdersTable'
+import AdminPaymentSettings from '../components/admin/AdminPaymentSettings'
 import AdminProductForm from '../components/admin/AdminProductForm'
 import AdminProductsTable from '../components/admin/AdminProductsTable'
+import AdminShippingSettings from '../components/admin/AdminShippingSettings'
 import { buildProductPayload, emptyProductForm, mapProductToForm } from '../helpers/admin'
 import {
   buildHomeContentPayload,
@@ -20,16 +22,38 @@ import { formatPrice } from '../helpers/price'
 import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
-const adminSections = ['Dashboard', 'Conteudo Home', 'Sobre Nos', 'Produtos', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
+const adminSections = ['Dashboard', 'Conteudo Home', 'Sobre Nos', 'Produtos', 'Frete', 'Pagamento', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
 const adminSectionIds = {
   Dashboard: 'dashboard',
   'Conteudo Home': 'conteudo-home',
   'Sobre Nos': 'sobre-nos',
   Produtos: 'produtos',
+  Frete: 'frete',
+  Pagamento: 'pagamento',
   Pedidos: 'pedidos',
   Clientes: 'clientes',
   Carrinhos: 'carrinhos',
   Relatorios: 'relatorios',
+}
+
+const emptyCarrier = {
+  name: '',
+  region: 'Sudeste',
+  base_freight: '0',
+  price_per_kg: '0',
+  value_rate: '0',
+  estimated_days: '5',
+  active: true,
+}
+
+const defaultPaymentSettings = {
+  provider: 'manual',
+  pix_enabled: true,
+  boleto_enabled: false,
+  pix_key: '',
+  recipient_name: 'Charme Joias e Acessorios',
+  bank_name: '',
+  instructions: '',
 }
 
 function AdminDashboard() {
@@ -41,6 +65,8 @@ function AdminDashboard() {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [savingHomeContent, setSavingHomeContent] = useState(false)
   const [savingAboutContent, setSavingAboutContent] = useState(false)
+  const [savingCarrier, setSavingCarrier] = useState(false)
+  const [savingPayment, setSavingPayment] = useState(false)
   const [uploadingHomeImage, setUploadingHomeImage] = useState(false)
   const [uploadingAboutImage, setUploadingAboutImage] = useState(false)
   const [error, setError] = useState('')
@@ -51,9 +77,13 @@ function AdminDashboard() {
   const [orders, setOrders] = useState([])
   const [abandonedCarts, setAbandonedCarts] = useState([])
   const [products, setProducts] = useState([])
+  const [shippingCarriers, setShippingCarriers] = useState([])
 
   const [productForm, setProductForm] = useState({ ...emptyProductForm })
   const [editingProductId, setEditingProductId] = useState(null)
+  const [shippingCarrierForm, setShippingCarrierForm] = useState({ ...emptyCarrier })
+  const [editingCarrierId, setEditingCarrierId] = useState(null)
+  const [paymentSettingsForm, setPaymentSettingsForm] = useState({ ...defaultPaymentSettings })
   const [homeContentForm, setHomeContentForm] = useState({ ...defaultHomeContent })
   const [aboutContentForm, setAboutContentForm] = useState({ ...defaultAboutContent })
 
@@ -62,7 +92,17 @@ function AdminDashboard() {
     setError('')
 
     try {
-      const [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes, homeContentRes, aboutContentRes] = await Promise.allSettled([
+      const [
+        dashboardRes,
+        customersRes,
+        ordersRes,
+        abandonedRes,
+        productsRes,
+        homeContentRes,
+        aboutContentRes,
+        shippingRes,
+        paymentRes,
+      ] = await Promise.allSettled([
         api.get('/admin/dashboard'),
         api.get('/admin/customers', { params: { limit: 300 } }),
         api.get('/admin/orders', { params: { limit: 300 } }),
@@ -70,9 +110,21 @@ function AdminDashboard() {
         api.get('/products', { params: { page: 1, size: 100 } }),
         api.get('/admin/home-content'),
         api.get('/admin/about-content'),
+        api.get('/admin/shipping-carriers'),
+        api.get('/admin/payment-settings'),
       ])
 
-      const failedRequests = [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes, homeContentRes, aboutContentRes]
+      const failedRequests = [
+        dashboardRes,
+        customersRes,
+        ordersRes,
+        abandonedRes,
+        productsRes,
+        homeContentRes,
+        aboutContentRes,
+        shippingRes,
+        paymentRes,
+      ]
         .filter((result) => result.status === 'rejected')
       const authError = failedRequests.find((result) => [401, 403].includes(result.reason?.response?.status))
 
@@ -107,6 +159,12 @@ function AdminDashboard() {
       }
       if (aboutContentRes.status === 'fulfilled') {
         setAboutContentForm(mapAboutContentToForm(aboutContentRes.value.data))
+      }
+      if (shippingRes.status === 'fulfilled') {
+        setShippingCarriers(shippingRes.value.data || [])
+      }
+      if (paymentRes.status === 'fulfilled') {
+        setPaymentSettingsForm({ ...defaultPaymentSettings, ...paymentRes.value.data })
       }
 
       const visibleFailures = failedRequests.filter((result) => result.reason?.response?.status !== 404)
@@ -163,6 +221,11 @@ function AdminDashboard() {
     setProductForm({ ...emptyProductForm })
   }
 
+  const resetShippingCarrierForm = () => {
+    setEditingCarrierId(null)
+    setShippingCarrierForm({ ...emptyCarrier })
+  }
+
   const handleAdminSectionClick = (section) => {
     const target = document.getElementById(adminSectionIds[section])
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -174,6 +237,14 @@ function AdminDashboard() {
 
   const handleAboutContentFieldChange = (field, value) => {
     setAboutContentForm((currentForm) => ({ ...currentForm, [field]: value }))
+  }
+
+  const handleShippingCarrierFieldChange = (field, value) => {
+    setShippingCarrierForm((currentForm) => ({ ...currentForm, [field]: value }))
+  }
+
+  const handlePaymentSettingsFieldChange = (field, value) => {
+    setPaymentSettingsForm((currentForm) => ({ ...currentForm, [field]: value }))
   }
 
   const handleSubmitHomeContent = async () => {
@@ -255,6 +326,100 @@ function AdminDashboard() {
       setError(serverMessage || 'Nao foi possivel enviar a imagem ao Cloudinary.')
     } finally {
       setUploadingAboutImage(false)
+    }
+  }
+
+  const buildShippingCarrierPayload = () => ({
+    name: shippingCarrierForm.name.trim(),
+    region: shippingCarrierForm.region,
+    base_freight: Number(shippingCarrierForm.base_freight || 0),
+    price_per_kg: Number(shippingCarrierForm.price_per_kg || 0),
+    value_rate: Number(shippingCarrierForm.value_rate || 0),
+    estimated_days: Number(shippingCarrierForm.estimated_days || 1),
+    active: Boolean(shippingCarrierForm.active),
+  })
+
+  const handleSubmitShippingCarrier = async () => {
+    setSavingCarrier(true)
+    setError('')
+
+    try {
+      const payload = buildShippingCarrierPayload()
+      if (editingCarrierId) {
+        await api.put(`/admin/shipping-carriers/${editingCarrierId}`, payload)
+        setSuccess('Transportadora atualizada com sucesso.')
+      } else {
+        await api.post('/admin/shipping-carriers', payload)
+        setSuccess('Transportadora cadastrada com sucesso.')
+      }
+      resetShippingCarrierForm()
+      await loadAdminData()
+    } catch (submitError) {
+      console.error('Erro ao salvar transportadora:', submitError)
+      const serverMessage = submitError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel salvar a transportadora.')
+    } finally {
+      setSavingCarrier(false)
+    }
+  }
+
+  const handleEditShippingCarrier = (carrier) => {
+    setEditingCarrierId(carrier.id)
+    setShippingCarrierForm({
+      name: carrier.name || '',
+      region: carrier.region || 'Sudeste',
+      base_freight: String(carrier.base_freight ?? 0),
+      price_per_kg: String(carrier.price_per_kg ?? 0),
+      value_rate: String(carrier.value_rate ?? 0),
+      estimated_days: String(carrier.estimated_days ?? 5),
+      active: Boolean(carrier.active),
+    })
+  }
+
+  const handleDeleteShippingCarrier = async (carrier) => {
+    const confirmed = window.confirm(`Deseja excluir a transportadora "${carrier.name}"?`)
+    if (!confirmed) {
+      return
+    }
+
+    setError('')
+    try {
+      await api.delete(`/admin/shipping-carriers/${carrier.id}`)
+      setSuccess('Transportadora excluida com sucesso.')
+      if (editingCarrierId === carrier.id) {
+        resetShippingCarrierForm()
+      }
+      await loadAdminData()
+    } catch (deleteError) {
+      console.error('Erro ao excluir transportadora:', deleteError)
+      const serverMessage = deleteError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel excluir a transportadora.')
+    }
+  }
+
+  const handleSubmitPaymentSettings = async () => {
+    setSavingPayment(true)
+    setError('')
+
+    try {
+      const payload = {
+        provider: paymentSettingsForm.provider,
+        pix_enabled: Boolean(paymentSettingsForm.pix_enabled),
+        boleto_enabled: Boolean(paymentSettingsForm.boleto_enabled),
+        pix_key: paymentSettingsForm.pix_key?.trim() || null,
+        recipient_name: paymentSettingsForm.recipient_name?.trim() || null,
+        bank_name: paymentSettingsForm.bank_name?.trim() || null,
+        instructions: paymentSettingsForm.instructions?.trim() || null,
+      }
+      const response = await api.put('/admin/payment-settings', payload)
+      setPaymentSettingsForm({ ...defaultPaymentSettings, ...response.data })
+      setSuccess('Configuracoes de pagamento atualizadas com sucesso.')
+    } catch (submitError) {
+      console.error('Erro ao salvar pagamento:', submitError)
+      const serverMessage = submitError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel salvar as configuracoes de pagamento.')
+    } finally {
+      setSavingPayment(false)
     }
   }
 
@@ -449,6 +614,29 @@ function AdminDashboard() {
           loading={loading}
           onEdit={handleEditProduct}
           onDelete={handleDeleteProduct}
+        />
+      </div>
+
+      <div id="frete" className="scroll-mt-28">
+        <AdminShippingSettings
+          carriers={shippingCarriers}
+          form={shippingCarrierForm}
+          editingId={editingCarrierId}
+          loading={savingCarrier}
+          onChange={handleShippingCarrierFieldChange}
+          onSubmit={handleSubmitShippingCarrier}
+          onEdit={handleEditShippingCarrier}
+          onDelete={handleDeleteShippingCarrier}
+          onCancel={resetShippingCarrierForm}
+        />
+      </div>
+
+      <div id="pagamento" className="scroll-mt-28">
+        <AdminPaymentSettings
+          form={paymentSettingsForm}
+          loading={savingPayment}
+          onChange={handlePaymentSettingsFieldChange}
+          onSubmit={handleSubmitPaymentSettings}
         />
       </div>
 

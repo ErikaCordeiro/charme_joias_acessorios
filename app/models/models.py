@@ -68,6 +68,44 @@ class SiteContent(Base):
     )
 
 
+class ShippingCarrier(Base):
+    __tablename__ = "shipping_carriers"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    region: Mapped[str] = mapped_column(String(40), index=True, nullable=False)
+    base_freight: Mapped[float] = mapped_column(Float, default=0, nullable=False)
+    price_per_kg: Mapped[float] = mapped_column(Float, default=0, nullable=False)
+    value_rate: Mapped[float] = mapped_column(Float, default=0, nullable=False)
+    estimated_days: Mapped[int] = mapped_column(Integer, default=5, nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+
+class PaymentSettings(Base):
+    __tablename__ = "payment_settings"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    provider: Mapped[str] = mapped_column(String(80), default="manual", nullable=False)
+    pix_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    boleto_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    pix_key: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    recipient_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    bank_name: Mapped[Optional[str]] = mapped_column(String(120), nullable=True)
+    instructions: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+
 class Cart(Base):
     __tablename__ = "carts"
 

@@ -15,8 +15,15 @@ from app.schemas.site import (
     HomeContentResponse,
     HomeContentUpdate,
 )
+from app.schemas.payment import PaymentSettingsResponse, PaymentSettingsUpdate
+from app.schemas.shipping import (
+    ShippingCarrierCreate,
+    ShippingCarrierResponse,
+    ShippingCarrierUpdate,
+)
 from app.services.admin import AdminService
 from app.services.site_content import SiteContentService
+from app.services.store_settings import StoreSettingsService
 
 router = APIRouter(
     prefix="/admin",
@@ -86,3 +93,52 @@ async def update_about_content(
 ):
     site_service = SiteContentService(db)
     return await site_service.update_about_content(data)
+
+
+@router.get("/shipping-carriers", response_model=list[ShippingCarrierResponse])
+async def list_shipping_carriers(db: AsyncSession = Depends(get_async_session)):
+    settings_service = StoreSettingsService(db)
+    return await settings_service.list_shipping_carriers()
+
+
+@router.post("/shipping-carriers", response_model=ShippingCarrierResponse)
+async def create_shipping_carrier(
+    data: ShippingCarrierCreate,
+    db: AsyncSession = Depends(get_async_session),
+):
+    settings_service = StoreSettingsService(db)
+    return await settings_service.create_shipping_carrier(data)
+
+
+@router.put("/shipping-carriers/{carrier_id}", response_model=ShippingCarrierResponse)
+async def update_shipping_carrier(
+    carrier_id: int,
+    data: ShippingCarrierUpdate,
+    db: AsyncSession = Depends(get_async_session),
+):
+    settings_service = StoreSettingsService(db)
+    return await settings_service.update_shipping_carrier(carrier_id, data)
+
+
+@router.delete("/shipping-carriers/{carrier_id}", status_code=204)
+async def delete_shipping_carrier(
+    carrier_id: int,
+    db: AsyncSession = Depends(get_async_session),
+):
+    settings_service = StoreSettingsService(db)
+    await settings_service.delete_shipping_carrier(carrier_id)
+
+
+@router.get("/payment-settings", response_model=PaymentSettingsResponse)
+async def get_payment_settings(db: AsyncSession = Depends(get_async_session)):
+    settings_service = StoreSettingsService(db)
+    return await settings_service.get_payment_settings()
+
+
+@router.put("/payment-settings", response_model=PaymentSettingsResponse)
+async def update_payment_settings(
+    data: PaymentSettingsUpdate,
+    db: AsyncSession = Depends(get_async_session),
+):
+    settings_service = StoreSettingsService(db)
+    return await settings_service.update_payment_settings(data)

@@ -6,8 +6,10 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.shipping import ShippingCalculate, ShippingResponse
+from app.services.store_settings import StoreSettingsService
 
 REGION_BY_UF = {
     "AC": "Norte",
@@ -90,21 +92,23 @@ HTTP_TIMEOUT_SECONDS = 3.5
 
 
 class ShippingService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+
     async def calculate_shipping(self, shipping_data: ShippingCalculate) -> ShippingResponse:
         cep = self._normalize_cep(shipping_data.cep)
         self._validate_input(cep=cep, weight=shipping_data.weight, value=shipping_data.value)
 
         uf = await self._resolve_uf(cep)
         region = REGION_BY_UF.get(uf, "Sudeste")
-        pricing = REGIONAL_PRICING.get(region, REGIONAL_PRICING["Sudeste"])
-        delivery = REGIONAL_DELIVERY.get(region, REGIONAL_DELIVERY["Sudeste"])
+        carrier = await StoreSettingsService(self.db).get_active_carrier_for_region(region)
 
-        base_freight = round(pricing["base"], 2)
-        weight_cost = round(shipping_data.weight * pricing["weight"], 2)
-        value_cost = round(shipping_data.value * pricing["value_rate"], 2)
+        base_freight = round(carrier.base_freight, 2)
+        weight_cost = round(shipping_data.weight * carrier.price_per_kg, 2)
+        value_cost = round(shipping_data.value * carrier.value_rate, 2)
         total_freight = round(base_freight + weight_cost + value_cost, 2)
         estimated_days = self._estimate_delivery_days(
-            base_days=delivery["base_days"],
+            base_days=carrier.estimated_days,
             weight=shipping_data.weight,
         )
 
@@ -112,7 +116,7 @@ class ShippingService:
             cep=self._format_cep(cep),
             uf=uf,
             region=region,
-            carrier=delivery["carrier"],
+            carrier=carrier.name,
             estimated_days=estimated_days,
             base_freight=base_freight,
             weight_cost=weight_cost,

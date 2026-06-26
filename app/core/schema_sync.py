@@ -52,10 +52,60 @@ def ensure_site_contents_table(connection, existing_tables: set[str]) -> None:
     )
 
 
+def ensure_store_settings_tables(connection, existing_tables: set[str]) -> None:
+    if "shipping_carriers" not in existing_tables:
+        connection.execute(
+            text(
+                """
+                CREATE TABLE shipping_carriers (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(120) NOT NULL,
+                    region VARCHAR(40) NOT NULL,
+                    base_freight DOUBLE PRECISION DEFAULT 0 NOT NULL,
+                    price_per_kg DOUBLE PRECISION DEFAULT 0 NOT NULL,
+                    value_rate DOUBLE PRECISION DEFAULT 0 NOT NULL,
+                    estimated_days INTEGER DEFAULT 5 NOT NULL,
+                    active BOOLEAN DEFAULT TRUE NOT NULL,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+                )
+                """
+            )
+        )
+        connection.execute(
+            text("CREATE INDEX IF NOT EXISTS ix_shipping_carriers_id ON shipping_carriers (id)")
+        )
+        connection.execute(
+            text("CREATE INDEX IF NOT EXISTS ix_shipping_carriers_region ON shipping_carriers (region)")
+        )
+
+    if "payment_settings" not in existing_tables:
+        connection.execute(
+            text(
+                """
+                CREATE TABLE payment_settings (
+                    id SERIAL PRIMARY KEY,
+                    provider VARCHAR(80) DEFAULT 'manual' NOT NULL,
+                    pix_enabled BOOLEAN DEFAULT TRUE NOT NULL,
+                    boleto_enabled BOOLEAN DEFAULT FALSE NOT NULL,
+                    pix_key VARCHAR(255),
+                    recipient_name VARCHAR(255),
+                    bank_name VARCHAR(120),
+                    instructions TEXT,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+                )
+                """
+            )
+        )
+        connection.execute(
+            text("CREATE INDEX IF NOT EXISTS ix_payment_settings_id ON payment_settings (id)")
+        )
+
+
 def sync_schema(connection) -> None:
     inspector = inspect(connection)
     table_names = set(inspector.get_table_names())
     ensure_site_contents_table(connection, table_names)
+    ensure_store_settings_tables(connection, table_names)
 
     if "users" not in table_names:
         return
