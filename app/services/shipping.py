@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.shipping import ShippingCalculate, ShippingResponse
+from app.schemas.shipping import ShippingCalculate, ShippingOptionsResponse, ShippingResponse
 from app.services.store_settings import StoreSettingsService
 
 REGION_BY_UF = {
@@ -96,21 +96,58 @@ class ShippingService:
         self.db = db
 
     async def calculate_shipping(self, shipping_data: ShippingCalculate) -> ShippingResponse:
+        options = await self.calculate_shipping_options(shipping_data)
+        return options.options[0]
+
+    async def calculate_shipping_options(self, shipping_data: ShippingCalculate) -> ShippingOptionsResponse:
         cep = self._normalize_cep(shipping_data.cep)
         self._validate_input(cep=cep, weight=shipping_data.weight, value=shipping_data.value)
 
         uf = await self._resolve_uf(cep)
         region = REGION_BY_UF.get(uf, "Sudeste")
-        carrier = await StoreSettingsService(self.db).get_active_carrier_for_region(region)
+        carriers = await StoreSettingsService(self.db).list_active_carriers_for_region(region)
+        options = [
+            self._build_quote(
+                cep=cep,
+                uf=uf,
+                region=region,
+                carrier=carrier,
+                weight=shipping_data.weight,
+                value=shipping_data.value,
+            )
+            for carrier in carriers
+        ]
+        options.sort(key=lambda option: (option.total_freight, option.estimated_days))
 
-        base_freight = round(carrier.base_freight, 2)
-        weight_cost = round(shipping_data.weight * carrier.price_per_kg, 2)
-        value_cost = round(shipping_data.value * carrier.value_rate, 2)
-        total_freight = round(base_freight + weight_cost + value_cost, 2)
-        estimated_days = self._estimate_delivery_days(
-            base_days=carrier.estimated_days,
-            weight=shipping_data.weight,
+        return ShippingOptionsResponse(
+            cep=self._format_cep(cep),
+            uf=uf,
+            region=region,
+            options=options,
         )
+
+    async def calculate_shipping_for_carrier(
+        self,
+        shipping_data: ShippingCalculate,
+        carrier_name: str | None,
+    ) -> ShippingResponse:
+        options = await self.calculate_shipping_options(shipping_data)
+        if carrier_name:
+            normalized = carrier_name.strip().lower()
+            selected = next(
+                (option for option in options.options if option.carrier.lower() == normalized),
+                None,
+            )
+            if selected:
+                return selected
+        return options.options[0]
+
+    def _build_quote(self, *, cep: str, uf: str, region: str, carrier, weight: float, value: float) -> ShippingResponse:
+        base_freight = round(carrier.base_freight, 2)
+        weight_cost = round(weight * carrier.price_per_kg, 2)
+        value_cost = round(value * carrier.value_rate, 2)
+        total_freight = round(base_freight + weight_cost + value_cost, 2)
+        estimated_days = self._estimate_delivery_days(base_days=carrier.estimated_days, weight=weight)
 
         return ShippingResponse(
             cep=self._format_cep(cep),

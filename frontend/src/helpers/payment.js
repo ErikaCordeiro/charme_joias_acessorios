@@ -27,7 +27,7 @@ export const validatePaymentForm = (paymentMethod, paymentForm) => {
   return ''
 }
 
-export const buildPaymentPayload = (paymentMethod, paymentForm, shippingCep) => {
+export const buildPaymentPayload = (paymentMethod, paymentForm, shippingCep, shippingCarrier = '') => {
   void paymentForm
 
   const enabledMethods = paymentMethods.map((method) => method.id)
@@ -40,5 +40,6 @@ export const buildPaymentPayload = (paymentMethod, paymentForm, shippingCep) => 
       method: paymentMethod,
     },
     shipping_cep: onlyDigits(shippingCep),
+    shipping_carrier: shippingCarrier || null,
   }
 }

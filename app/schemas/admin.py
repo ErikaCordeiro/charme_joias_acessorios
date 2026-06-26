@@ -35,6 +35,7 @@ class AdminOrderResponse(BaseModel):
     user_id: int
     user_email: str
     total: float
+    shipping_carrier: Optional[str] = None
     status: OrderStatus
     items_count: int
     created_at: datetime

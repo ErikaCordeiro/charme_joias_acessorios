@@ -48,6 +48,7 @@ function Checkout() {
   const [shippingLoading, setShippingLoading] = useState(false)
   const [shippingError, setShippingError] = useState('')
   const [shippingQuote, setShippingQuote] = useState(null)
+  const [shippingOptions, setShippingOptions] = useState([])
 
   const [paymentMethod, setPaymentMethod] = useState('pix')
   const [paymentForm, setPaymentForm] = useState({ ...defaultPaymentForm })
@@ -172,6 +173,7 @@ function Checkout() {
     setShippingLoading(true)
     setShippingError('')
     setShippingQuote(null)
+    setShippingOptions([])
 
     try {
       const weight = estimateCartWeight(cart.items)
@@ -181,7 +183,9 @@ function Checkout() {
         value: subtotal,
       })
 
-      setShippingQuote(response.data)
+      const options = response.data?.options || []
+      setShippingOptions(options)
+      setShippingQuote(options[0] || null)
       setCep(formatCep(normalizedCep))
       setFeedback({
         type: 'success',
@@ -217,7 +221,7 @@ function Checkout() {
     setError('')
 
     try {
-      const payload = buildPaymentPayload(paymentMethod, paymentForm, cep)
+      const payload = buildPaymentPayload(paymentMethod, paymentForm, cep, shippingQuote?.carrier)
       const response = await api.post('/orders/', payload)
       const createdOrder = response.data.order
       const paymentResult = response.data.payment
@@ -243,6 +247,7 @@ function Checkout() {
         subtotal: 0,
       }))
       setShippingQuote(null)
+      setShippingOptions([])
       setShippingError('')
 
       setFeedback({
@@ -406,6 +411,9 @@ function Checkout() {
             onCalculateShipping={handleCalculateShipping}
             loading={shippingLoading}
             shippingQuote={shippingQuote}
+            shippingOptions={shippingOptions}
+            selectedCarrier={shippingQuote?.carrier || ''}
+            onSelectShippingOption={setShippingQuote}
             shippingError={shippingError}
             disabled={placingOrder}
           />

@@ -20,6 +20,7 @@ class OrderResponse(BaseModel):
     user_id: int
     total: float
     freight_total: float
+    shipping_carrier: str | None = None
     status: OrderStatus
     created_at: datetime
     items: List[OrderItemResponse]
@@ -31,6 +32,7 @@ class OrderResponse(BaseModel):
 class OrderCreate(BaseModel):
     payment: PaymentRequest
     shipping_cep: str = Field(min_length=8, max_length=9, pattern=r"^\d{5}-?\d{3}$")
+    shipping_carrier: str | None = Field(default=None, max_length=120)
 
 
 class OrderUpdate(BaseModel):

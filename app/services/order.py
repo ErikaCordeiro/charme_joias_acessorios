@@ -41,12 +41,13 @@ class OrderService:
         estimated_weight = sum(
             item.quantity * ESTIMATED_ITEM_WEIGHT_KG for item, _product in cart_items
         )
-        shipping_quote = await ShippingService(self.db).calculate_shipping(
+        shipping_quote = await ShippingService(self.db).calculate_shipping_for_carrier(
             ShippingCalculate(
                 cep=order_data.shipping_cep,
                 weight=estimated_weight,
                 value=subtotal,
-            )
+            ),
+            order_data.shipping_carrier,
         )
         freight_total = shipping_quote.total_freight
         total = subtotal + freight_total
@@ -76,6 +77,7 @@ class OrderService:
             user_id=user_id,
             total=total,
             freight_total=freight_total,
+            shipping_carrier=shipping_quote.carrier,
             status=order_status,
         )
         self.db.add(order)

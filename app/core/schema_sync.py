@@ -18,6 +18,7 @@ USER_COLUMN_DEFINITIONS = {
 
 ORDER_COLUMN_DEFINITIONS = {
     "freight_total": "DOUBLE PRECISION DEFAULT 0 NOT NULL",
+    "shipping_carrier": "VARCHAR(120)",
 }
 
 

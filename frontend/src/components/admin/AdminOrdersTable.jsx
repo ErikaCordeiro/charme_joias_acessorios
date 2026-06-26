@@ -16,6 +16,7 @@ function AdminOrdersTable({ orders }) {
                 <th className="pb-3 pr-6">Cliente</th>
                 <th className="pb-3 pr-6">Status</th>
                 <th className="pb-3 pr-6">Itens</th>
+                <th className="pb-3 pr-6">Frete</th>
                 <th className="pb-3 pr-6">Total</th>
                 <th className="pb-3">Data</th>
               </tr>
@@ -27,6 +28,7 @@ function AdminOrdersTable({ orders }) {
                   <td className="min-w-48 py-3 pr-6">{order.user_email}</td>
                   <td className="py-3 pr-6">{order.status}</td>
                   <td className="py-3 pr-6">{order.items_count}</td>
+                  <td className="py-3 pr-6">{order.shipping_carrier || '-'}</td>
                   <td className="py-3 pr-6 font-medium text-[#101827]">{formatPrice(order.total)}</td>
                   <td className="py-3">{new Date(order.created_at).toLocaleString('pt-BR')}</td>
                 </tr>

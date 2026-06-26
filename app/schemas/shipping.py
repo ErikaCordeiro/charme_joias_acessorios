@@ -22,6 +22,15 @@ class ShippingResponse(BaseModel):
     total_freight: float
 
 
+class ShippingOptionsResponse(BaseModel):
+    cep: str
+    uf: str
+    region: str
+    origin_city: str = "Palhoca"
+    origin_state: str = "SC"
+    options: list[ShippingResponse]
+
+
 class ShippingCarrierBase(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     region: str = Field(min_length=2, max_length=40)

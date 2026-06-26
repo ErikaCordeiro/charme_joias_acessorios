@@ -80,7 +80,7 @@ function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#0b6f78]/10 bg-[#fbf8f1]/98 backdrop-blur">
+    <header ref={productsMenuRef} className="sticky top-0 z-50 border-b border-[#0b6f78]/10 bg-[#fbf8f1]/98 backdrop-blur">
       <div className="mx-auto grid max-w-7xl grid-cols-[1fr_auto_1fr] gap-x-3 gap-y-3 px-3 py-3 sm:px-5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:px-8">
         <Link to="/" className="col-start-2 -col-end-1 justify-self-center font-serif text-2xl font-semibold leading-tight tracking-tight text-[#0b6f78] sm:text-3xl lg:col-start-1 lg:col-end-2 lg:justify-self-start">
           Charme
@@ -92,7 +92,7 @@ function Header() {
             Inicio
           </Link>
 
-          <div ref={productsMenuRef} className="shrink-0">
+          <div className="shrink-0">
             <button
               type="button"
               onClick={() => setProductsOpen((open) => !open)}
