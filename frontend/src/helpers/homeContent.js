@@ -11,16 +11,32 @@ export const defaultHomeContent = {
   image_alt: 'Mulher usando joias delicadas da Charme',
 }
 
-export const mapHomeContentToForm = (content = {}) => ({
-  eyebrow: content.eyebrow || defaultHomeContent.eyebrow,
-  title: content.title || defaultHomeContent.title,
-  body_primary: content.body_primary || defaultHomeContent.body_primary,
-  body_secondary: content.body_secondary || defaultHomeContent.body_secondary,
-  cta_label: content.cta_label || defaultHomeContent.cta_label,
-  cta_url: content.cta_url || defaultHomeContent.cta_url,
-  image_url: content.image_url || defaultHomeContent.image_url,
-  image_alt: content.image_alt || defaultHomeContent.image_alt,
+export const defaultAboutContent = {
+  eyebrow: 'Sobre a marca',
+  title: 'Charme Joias e Acessorios',
+  body_primary:
+    'A Charme nasceu para valorizar a beleza de cada mulher atraves de pecas delicadas, modernas e cheias de personalidade.',
+  body_secondary:
+    'Nosso atendimento combina curadoria feminina, cuidado em cada detalhe e semijoias selecionadas para momentos especiais e para o dia a dia.',
+  cta_label: 'Ver produtos',
+  cta_url: '/products',
+  image_url: '/products/charme/conjunto-coracao-dourado.jpeg',
+  image_alt: 'Selecao de joias douradas Charme',
+}
+
+export const mapSiteContentToForm = (content = {}, fallback = defaultHomeContent) => ({
+  eyebrow: content.eyebrow || fallback.eyebrow,
+  title: content.title || fallback.title,
+  body_primary: content.body_primary || fallback.body_primary,
+  body_secondary: content.body_secondary || fallback.body_secondary,
+  cta_label: content.cta_label || fallback.cta_label,
+  cta_url: content.cta_url || fallback.cta_url,
+  image_url: content.image_url || fallback.image_url,
+  image_alt: content.image_alt || fallback.image_alt,
 })
+
+export const mapHomeContentToForm = (content = {}) => mapSiteContentToForm(content, defaultHomeContent)
+export const mapAboutContentToForm = (content = {}) => mapSiteContentToForm(content, defaultAboutContent)
 
 export const buildHomeContentPayload = (form) => ({
   eyebrow: form.eyebrow.trim() || null,

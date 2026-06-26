@@ -9,7 +9,12 @@ from app.schemas.admin import (
     AdminDashboardResponse,
     AdminOrderResponse,
 )
-from app.schemas.site import HomeContentResponse, HomeContentUpdate
+from app.schemas.site import (
+    AboutContentResponse,
+    AboutContentUpdate,
+    HomeContentResponse,
+    HomeContentUpdate,
+)
 from app.services.admin import AdminService
 from app.services.site_content import SiteContentService
 
@@ -66,3 +71,18 @@ async def update_home_content(
 ):
     site_service = SiteContentService(db)
     return await site_service.update_home_content(data)
+
+
+@router.get("/about-content", response_model=AboutContentResponse)
+async def get_about_content(db: AsyncSession = Depends(get_async_session)):
+    site_service = SiteContentService(db)
+    return await site_service.get_about_content()
+
+
+@router.put("/about-content", response_model=AboutContentResponse)
+async def update_about_content(
+    data: AboutContentUpdate,
+    db: AsyncSession = Depends(get_async_session),
+):
+    site_service = SiteContentService(db)
+    return await site_service.update_about_content(data)

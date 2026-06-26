@@ -47,7 +47,7 @@ function Products() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const searchTerm = searchParams.get('search')?.trim() || ''
-  const categoryTerm = searchParams.get('category')?.trim() || ''
+  const categoryTerm = searchParams.get('category')?.trim().toLowerCase() || ''
   const categoryLabel = categoryLabels[categoryTerm] || 'Joias'
   const backendCategory = categoryTerm === 'joias' ? '' : categoryTerm
 

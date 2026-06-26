@@ -37,7 +37,7 @@ class ProductService:
         if search:
             query = query.where(or_(Product.name.ilike(f"%{search}%"), Product.description.ilike(f"%{search}%")))
         if category:
-            query = query.where(Product.category == category)
+            query = query.where(func.lower(Product.category) == category.lower())
         if min_price is not None:
             query = query.where(Product.price >= min_price)
         if max_price is not None:
@@ -57,7 +57,7 @@ class ProductService:
         if search:
             query = query.where(or_(Product.name.ilike(f"%{search}%"), Product.description.ilike(f"%{search}%")))
         if category:
-            query = query.where(Product.category == category)
+            query = query.where(func.lower(Product.category) == category.lower())
         if min_price is not None:
             query = query.where(Product.price >= min_price)
         if max_price is not None:

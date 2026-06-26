@@ -75,7 +75,6 @@ class AdminService:
     async def list_customers(self, limit: int = 200) -> List[AdminCustomerResponse]:
         stmt = (
             select(User)
-            .where(User.is_admin.is_(False))
             .order_by(User.created_at.desc())
             .limit(limit)
         )

@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
 
-import { getWhatsAppProductLink } from '../../helpers/contact'
 import { formatPrice } from '../../helpers/price'
 
 function HomeHighlightCard({ product }) {
+  const productUrl = `/products?search=${encodeURIComponent(product.name)}`
+
   return (
     <article className="group border border-[#0b6f78]/12 bg-white transition hover:-translate-y-1 hover:border-[#d8a84f]/60 hover:shadow-[0_22px_60px_rgba(6,47,53,0.10)]">
-      <Link to="/products" className="block overflow-hidden bg-[#f7f1e8]">
+      <Link to={productUrl} className="block overflow-hidden bg-[#f7f1e8]">
         <img
           src={product.image_url || '/products/charme/conjunto-dourado-caixa.jpeg'}
           alt={product.name}
@@ -19,14 +20,12 @@ function HomeHighlightCard({ product }) {
         </p>
         <h3 className="min-h-12 text-sm font-medium leading-6 text-[#111226]">{product.name}</h3>
         <p className="text-base font-bold text-[#062f35]">{formatPrice(product.price)}</p>
-        <a
-          href={getWhatsAppProductLink(product.name, formatPrice(product.price))}
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          to={productUrl}
           className="inline-flex w-full items-center justify-center border border-[#d8a84f] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#062f35] transition hover:bg-[#d8a84f] hover:text-white"
         >
           Tenho interesse
-        </a>
+        </Link>
       </div>
     </article>
   )

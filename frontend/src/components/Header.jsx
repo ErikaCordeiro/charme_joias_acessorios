@@ -32,6 +32,11 @@ function Header() {
     navigate('/login')
   }
 
+  const handleCategoryNavigate = (to) => {
+    setProductsOpen(false)
+    navigate(to)
+  }
+
   useEffect(() => {
     if (!token) {
       return
@@ -152,14 +157,14 @@ function Header() {
         <div className="border-t border-[#0b6f78]/10 bg-white shadow-[0_18px_50px_rgba(17,18,38,0.08)]">
           <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 px-4 py-3 sm:grid-cols-4 sm:px-6 lg:grid-cols-8 lg:px-8">
             {productCategories.map((category) => (
-              <Link
+              <button
                 key={category.label}
-                to={category.to}
-                onClick={() => setProductsOpen(false)}
+                type="button"
+                onClick={() => handleCategoryNavigate(category.to)}
                 className="rounded-xl px-3 py-3 text-left text-sm font-medium text-[#111226]/72 transition hover:bg-[#0b6f78]/8 hover:text-[#0b6f78] sm:text-center"
               >
                 {category.label}
-              </Link>
+              </button>
             ))}
           </div>
         </div>

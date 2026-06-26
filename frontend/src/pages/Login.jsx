@@ -21,7 +21,12 @@ function Login() {
       const token = response.data?.access_token
       if (token) {
         setStoredToken(token)
-        navigate('/profile')
+        try {
+          const meResponse = await api.get('/auth/me')
+          navigate(meResponse.data?.is_admin ? '/admin' : '/profile')
+        } catch {
+          navigate('/profile')
+        }
       } else {
         setError('Nao foi possivel autenticar. Tente novamente.')
       }

@@ -2,6 +2,11 @@ function AdminHomeContentForm({
   form,
   loading = false,
   uploadingImage = false,
+  eyebrow = 'Home',
+  title = 'Conteudo institucional',
+  description = 'Edite o texto e a imagem da secao "Elegancia em cada detalhe" exibida na pagina inicial.',
+  submitLabel = 'Salvar conteudo da home',
+  imageUploadLabel = 'Upload imagem',
   onChange,
   onSubmit,
   onUploadImage,
@@ -12,12 +17,12 @@ function AdminHomeContentForm({
     'rounded-[6px] border border-[#0A6772]/14 bg-[#FAFAF8] px-4 py-3 text-sm text-[#101827] outline-none transition placeholder:text-[#101827]/35 focus:border-[#0A6772] focus:bg-white focus:ring-4 focus:ring-[#0A6772]/10'
 
   return (
-    <section id="conteudo-home" className="rounded-[6px] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_45px_rgba(10,103,114,0.06)]">
+    <section className="rounded-[6px] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_45px_rgba(10,103,114,0.06)]">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#B98D3A]">Home</p>
-        <h2 className="mt-1 font-serif text-2xl text-[#12343A]">Conteudo institucional</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#B98D3A]">{eyebrow}</p>
+        <h2 className="mt-1 font-serif text-2xl text-[#12343A]">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-[#101827]/58">
-          Edite o texto e a imagem da secao "Elegancia em cada detalhe" exibida na pagina inicial.
+          {description}
         </p>
       </div>
 
@@ -80,7 +85,7 @@ function AdminHomeContentForm({
             className={inputClass}
           />
           <label className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-[#0A6772]/20 px-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#0A6772] transition hover:border-[#0A6772]">
-            {uploadingImage ? 'Enviando...' : 'Upload imagem'}
+            {uploadingImage ? 'Enviando...' : imageUploadLabel}
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
@@ -115,7 +120,7 @@ function AdminHomeContentForm({
           disabled={loading}
           className="h-11 rounded-full bg-[#0A6772] px-5 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#095c65] disabled:opacity-60 lg:col-span-2"
         >
-          {loading ? 'Salvando...' : 'Salvar conteudo da home'}
+          {loading ? 'Salvando...' : submitLabel}
         </button>
       </form>
     </section>

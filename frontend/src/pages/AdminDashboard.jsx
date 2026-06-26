@@ -9,12 +9,28 @@ import AdminOrdersTable from '../components/admin/AdminOrdersTable'
 import AdminProductForm from '../components/admin/AdminProductForm'
 import AdminProductsTable from '../components/admin/AdminProductsTable'
 import { buildProductPayload, emptyProductForm, mapProductToForm } from '../helpers/admin'
-import { buildHomeContentPayload, defaultHomeContent, mapHomeContentToForm } from '../helpers/homeContent'
+import {
+  buildHomeContentPayload,
+  defaultAboutContent,
+  defaultHomeContent,
+  mapAboutContentToForm,
+  mapHomeContentToForm,
+} from '../helpers/homeContent'
 import { formatPrice } from '../helpers/price'
 import { clearStoredToken, getStoredToken } from '../helpers/storage'
 import api from '../services/api'
 
-const adminSections = ['Dashboard', 'Conteudo Home', 'Produtos', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
+const adminSections = ['Dashboard', 'Conteudo Home', 'Sobre Nos', 'Produtos', 'Pedidos', 'Clientes', 'Carrinhos', 'Relatorios']
+const adminSectionIds = {
+  Dashboard: 'dashboard',
+  'Conteudo Home': 'conteudo-home',
+  'Sobre Nos': 'sobre-nos',
+  Produtos: 'produtos',
+  Pedidos: 'pedidos',
+  Clientes: 'clientes',
+  Carrinhos: 'carrinhos',
+  Relatorios: 'relatorios',
+}
 
 function AdminDashboard() {
   const token = getStoredToken()
@@ -24,7 +40,9 @@ function AdminDashboard() {
   const [savingProduct, setSavingProduct] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [savingHomeContent, setSavingHomeContent] = useState(false)
+  const [savingAboutContent, setSavingAboutContent] = useState(false)
   const [uploadingHomeImage, setUploadingHomeImage] = useState(false)
+  const [uploadingAboutImage, setUploadingAboutImage] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -37,27 +55,64 @@ function AdminDashboard() {
   const [productForm, setProductForm] = useState({ ...emptyProductForm })
   const [editingProductId, setEditingProductId] = useState(null)
   const [homeContentForm, setHomeContentForm] = useState({ ...defaultHomeContent })
+  const [aboutContentForm, setAboutContentForm] = useState({ ...defaultAboutContent })
 
   const loadAdminData = useCallback(async () => {
     setLoading(true)
     setError('')
 
     try {
-      const [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes, homeContentRes] = await Promise.all([
+      const [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes, homeContentRes, aboutContentRes] = await Promise.allSettled([
         api.get('/admin/dashboard'),
         api.get('/admin/customers', { params: { limit: 300 } }),
         api.get('/admin/orders', { params: { limit: 300 } }),
         api.get('/admin/abandoned-carts', { params: { limit: 300 } }),
         api.get('/products', { params: { page: 1, size: 100 } }),
         api.get('/admin/home-content'),
+        api.get('/admin/about-content'),
       ])
 
-      setMetrics(dashboardRes.data.metrics)
-      setCustomers(customersRes.data)
-      setOrders(ordersRes.data)
-      setAbandonedCarts(abandonedRes.data)
-      setProducts(productsRes.data.products || [])
-      setHomeContentForm(mapHomeContentToForm(homeContentRes.data))
+      const failedRequests = [dashboardRes, customersRes, ordersRes, abandonedRes, productsRes, homeContentRes, aboutContentRes]
+        .filter((result) => result.status === 'rejected')
+      const authError = failedRequests.find((result) => [401, 403].includes(result.reason?.response?.status))
+
+      if (authError?.reason?.response?.status === 401) {
+        clearStoredToken()
+        navigate('/login')
+        return
+      }
+
+      if (authError?.reason?.response?.status === 403) {
+        setError('Sua conta nao tem permissao para acessar a dashboard admin.')
+        return
+      }
+
+      if (dashboardRes.status === 'fulfilled') {
+        setMetrics(dashboardRes.value.data.metrics)
+      }
+      if (customersRes.status === 'fulfilled') {
+        setCustomers(customersRes.value.data)
+      }
+      if (ordersRes.status === 'fulfilled') {
+        setOrders(ordersRes.value.data)
+      }
+      if (abandonedRes.status === 'fulfilled') {
+        setAbandonedCarts(abandonedRes.value.data)
+      }
+      if (productsRes.status === 'fulfilled') {
+        setProducts(productsRes.value.data.products || [])
+      }
+      if (homeContentRes.status === 'fulfilled') {
+        setHomeContentForm(mapHomeContentToForm(homeContentRes.value.data))
+      }
+      if (aboutContentRes.status === 'fulfilled') {
+        setAboutContentForm(mapAboutContentToForm(aboutContentRes.value.data))
+      }
+
+      const visibleFailures = failedRequests.filter((result) => result.reason?.response?.status !== 404)
+      if (visibleFailures.length > 0) {
+        setError('Algumas informacoes do painel nao carregaram. Clique em Atualizar ou verifique os logs da API no Render.')
+      }
     } catch (loadError) {
       console.error('Erro ao carregar dashboard admin:', loadError)
       const status = loadError?.response?.status
@@ -108,8 +163,17 @@ function AdminDashboard() {
     setProductForm({ ...emptyProductForm })
   }
 
+  const handleAdminSectionClick = (section) => {
+    const target = document.getElementById(adminSectionIds[section])
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const handleHomeContentFieldChange = (field, value) => {
     setHomeContentForm((currentForm) => ({ ...currentForm, [field]: value }))
+  }
+
+  const handleAboutContentFieldChange = (field, value) => {
+    setAboutContentForm((currentForm) => ({ ...currentForm, [field]: value }))
   }
 
   const handleSubmitHomeContent = async () => {
@@ -150,6 +214,47 @@ function AdminDashboard() {
       setError(serverMessage || 'Nao foi possivel enviar a imagem da home.')
     } finally {
       setUploadingHomeImage(false)
+    }
+  }
+
+  const handleSubmitAboutContent = async () => {
+    setSavingAboutContent(true)
+    setError('')
+
+    try {
+      const response = await api.put('/admin/about-content', buildHomeContentPayload(aboutContentForm))
+      setAboutContentForm(mapAboutContentToForm(response.data))
+      setSuccess('Conteudo do Sobre nos atualizado com sucesso.')
+    } catch (submitError) {
+      console.error('Erro ao salvar conteudo do Sobre nos:', submitError)
+      const serverMessage = submitError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel salvar o conteudo do Sobre nos.')
+    } finally {
+      setSavingAboutContent(false)
+    }
+  }
+
+  const handleUploadAboutImage = async (file) => {
+    setUploadingAboutImage(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('folder', 'charme/banners')
+
+      const response = await api.post('/media/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+
+      handleAboutContentFieldChange('image_url', response.data.secure_url)
+      setSuccess('Imagem do Sobre nos enviada ao Cloudinary com sucesso.')
+    } catch (uploadError) {
+      console.error('Erro ao enviar imagem do Sobre nos:', uploadError)
+      const serverMessage = uploadError?.response?.data?.detail
+      setError(serverMessage || 'Nao foi possivel enviar a imagem ao Cloudinary.')
+    } finally {
+      setUploadingAboutImage(false)
     }
   }
 
@@ -267,13 +372,14 @@ function AdminDashboard() {
 
         <nav className="mt-5 -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {adminSections.map((section) => (
-            <a
+            <button
               key={section}
-              href={section === 'Dashboard' ? '#dashboard' : `#${section.toLowerCase().replaceAll(' ', '-')}`}
+              type="button"
+              onClick={() => handleAdminSectionClick(section)}
               className="shrink-0 rounded-full border border-[#0A6772]/12 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#101827]/62 transition hover:border-[#0A6772]/35 hover:text-[#0A6772]"
             >
               {section}
-            </a>
+            </button>
           ))}
         </nav>
       </header>
@@ -300,16 +406,33 @@ function AdminDashboard() {
         </div>
       )}
 
-      <AdminHomeContentForm
-        form={homeContentForm}
-        loading={savingHomeContent}
-        uploadingImage={uploadingHomeImage}
-        onChange={handleHomeContentFieldChange}
-        onSubmit={handleSubmitHomeContent}
-        onUploadImage={handleUploadHomeImage}
-      />
+      <div id="conteudo-home" className="scroll-mt-28">
+        <AdminHomeContentForm
+          form={homeContentForm}
+          loading={savingHomeContent}
+          uploadingImage={uploadingHomeImage}
+          onChange={handleHomeContentFieldChange}
+          onSubmit={handleSubmitHomeContent}
+          onUploadImage={handleUploadHomeImage}
+        />
+      </div>
 
-      <div id="produtos" className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+      <div id="sobre-nos" className="scroll-mt-28">
+        <AdminHomeContentForm
+          form={aboutContentForm}
+          loading={savingAboutContent}
+          uploadingImage={uploadingAboutImage}
+          eyebrow="Sobre nos"
+          title="Conteudo da pagina Sobre nos"
+          description="Edite o texto, imagem e botao exibidos na pagina institucional da marca."
+          submitLabel="Salvar Sobre nos"
+          onChange={handleAboutContentFieldChange}
+          onSubmit={handleSubmitAboutContent}
+          onUploadImage={handleUploadAboutImage}
+        />
+      </div>
+
+      <div id="produtos" className="grid scroll-mt-28 gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <AdminProductForm
           form={productForm}
           loading={savingProduct}
@@ -321,22 +444,33 @@ function AdminDashboard() {
           uploadingImage={uploadingImage}
         />
 
-        <AdminAbandonedCartsTable carts={abandonedCarts} />
+        <AdminProductsTable
+          products={products}
+          loading={loading}
+          onEdit={handleEditProduct}
+          onDelete={handleDeleteProduct}
+        />
       </div>
 
-      <AdminProductsTable
-        products={products}
-        loading={loading}
-        onEdit={handleEditProduct}
-        onDelete={handleDeleteProduct}
-      />
-
-      <div id="pedidos">
+      <div id="pedidos" className="scroll-mt-28">
         <AdminOrdersTable orders={orders} />
       </div>
-      <div id="clientes">
+      <div id="clientes" className="scroll-mt-28">
         <AdminCustomersTable customers={customers} />
       </div>
+      <div id="carrinhos" className="scroll-mt-28">
+        <AdminAbandonedCartsTable carts={abandonedCarts} />
+      </div>
+      <section id="relatorios" className="scroll-mt-28 rounded-[6px] border border-[#0A6772]/12 bg-white p-5 shadow-[0_18px_45px_rgba(10,103,114,0.06)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#B98D3A]">Relatorios</p>
+        <h2 className="mt-2 font-serif text-2xl text-[#12343A]">Resumo comercial</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <AdminMetricCard title="Vendas totais" value={formatPrice(metrics?.total_sales_amount || 0)} />
+          <AdminMetricCard title="Vendas pagas" value={formatPrice(metrics?.paid_sales_amount || 0)} />
+          <AdminMetricCard title="Pedidos" value={metrics?.total_orders || 0} />
+          <AdminMetricCard title="Ticket medio" value={formatPrice(averageTicket)} />
+        </div>
+      </section>
     </section>
   )
 }
